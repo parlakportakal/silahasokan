@@ -4,13 +4,19 @@
 [ext_resource type="Texture2D" uid="uid://h4x0tusyksxb" path="res://icon.svg" id="2_6t5aa"]
 
 [sub_resource type="CapsuleShape2D" id="CapsuleShape2D_g4v7s"]
+radius = 15.0
+height = 42.0
 
 [node name="player" type="CharacterBody2D" unique_id=824720089]
 script = ExtResource("1_cvnsp")
+air_control = 0.4
+jump_velocity = -429.43
+gravity = 1800.0
+fall_gravity_multiplier = 2.0
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="." unique_id=668489652]
 shape = SubResource("CapsuleShape2D_g4v7s")
 
 [node name="Sprite2D" type="Sprite2D" parent="." unique_id=721585257]
-scale = Vector2(0.15625, 0.203125)
+scale = Vector2(0.21875, 0.31249997)
 texture = ExtResource("2_6t5aa")

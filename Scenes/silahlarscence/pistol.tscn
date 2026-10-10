@@ -1,0 +1,14 @@
+[gd_scene format=3 uid="uid://bgld8x6dlgami"]
+
+[ext_resource type="Texture2D" uid="uid://6nfdjpihaus2" path="res://Assets/silahlar/pistol3.png" id="1_nyvln"]
+[ext_resource type="Script" uid="uid://cyc6xfdxkinpf" path="res://Scenes/silahlarscence/pistol.gd" id="1_xsm3s"]
+
+[node name="pistol" type="Node2D" unique_id=263644930]
+script = ExtResource("1_xsm3s")
+
+[node name="Sprite2D" type="Sprite2D" parent="." unique_id=1737864667]
+scale = Vector2(0.04819278, 0.048192773)
+texture = ExtResource("1_nyvln")
+
+[node name="Marker2D" type="Marker2D" parent="." unique_id=1945487344]
+position = Vector2(9.94, -2.5)
