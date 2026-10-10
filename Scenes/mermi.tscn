@@ -1,11 +1,13 @@
 [gd_scene format=3 uid="uid://bf6niddbhclxo"]
 
+[ext_resource type="Script" uid="uid://br7m61nq1u27m" path="res://Scripts/mermi.gd" id="1_06o81"]
 [ext_resource type="Texture2D" uid="uid://c0qq7kdwf1nh5" path="res://Assets/silahlar/small_bullet3.png" id="1_orvw2"]
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_orvw2"]
 size = Vector2(3.425, 1.365)
 
 [node name="mermi" type="Area2D" unique_id=1313714118]
+script = ExtResource("1_06o81")
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="." unique_id=1062708138]
 shape = SubResource("RectangleShape2D_orvw2")
