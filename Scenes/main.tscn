@@ -13,6 +13,7 @@ script = ExtResource("1_8gbba")
 
 [node name="PLATFORM" parent="PLATFORMLAR" unique_id=1875693618 instance=ExtResource("1_bo1nx")]
 position = Vector2(503, 370)
+scale = Vector2(11.479998, 1)
 
 [node name="PLATFORM2" parent="PLATFORMLAR" unique_id=1868514009 instance=ExtResource("1_bo1nx")]
 position = Vector2(335, 496)

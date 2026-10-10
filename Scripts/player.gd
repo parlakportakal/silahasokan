@@ -60,6 +60,7 @@ var can_cut_jump: bool = false      # Bu zıplama tuş bırakılınca kısalabil
 
 func _physics_process(delta: float) -> void:
 	var was_on_floor := is_on_floor()  # Bu karedeki başlangıç durumu
+	# kralinyo sağ sol yaparken dönerken
 
 	_update_timers(delta)
 	_apply_gravity(delta)
@@ -70,7 +71,6 @@ func _physics_process(delta: float) -> void:
 	# Havadan yere yeni indiysek
 	if is_on_floor() and not was_on_floor:
 		_on_landed()
-
 
 # -----------------------------------------------------
 #  Yere iniş anında bir kez çalışır
@@ -103,7 +103,10 @@ func _update_timers(delta: float) -> void:
 
 	if Input.is_action_just_pressed("zipla"):
 		jump_buffer_timer = jump_buffer_time  # Tuşa basıldığını hatırla
-
+	if Input.is_action_just_pressed("saga"):
+		$Sprite2D.flip_h = false
+	if Input.is_action_just_pressed("sola"):
+		$Sprite2D.flip_h = true
 
 # -----------------------------------------------------
 #  Yerçekimi
@@ -171,3 +174,6 @@ func _handle_horizontal(delta: float) -> void:
 	else:
 		# Tuş yok: sürtünmeyle yavaşla
 		velocity.x = move_toward(velocity.x, 0.0, friction * control * delta)
+
+
+#bunu ben yazdım

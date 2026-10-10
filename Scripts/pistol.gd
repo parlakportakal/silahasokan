@@ -74,10 +74,16 @@ func _process(delta: float) -> void:
 #  Karakterin baktığı yöne göre silahı çevir
 # -----------------------------------------------------
 func _update_facing() -> void:
-	# Sağ/sol tuşuna basılıyorsa yönü güncelle, bırakınca son yön kalır
-	var direction := Input.get_axis("move_left", "move_right")
-	if direction != 0.0:
-		facing = 1 if direction > 0.0 else -1
+	# Tuşa basıldığı AN yönü değiştir (hareket etmeni beklemez, son basılan tuş kazanır)
+	if Input.is_action_just_pressed("sola"):
+		facing = -1
+	elif Input.is_action_just_pressed("saga"):
+		facing = 1
+	# Bir tuş bırakılınca hâlâ basılı olan diğer tuşun yönüne dön
+	elif Input.is_action_just_released("sola") and Input.is_action_pressed("saga"):
+		facing = 1
+	elif Input.is_action_just_released("saga") and Input.is_action_pressed("sola"):
+		facing = -1
 
 	# Sağa bakıyorsa açı 0, sola bakıyorsa 180 derece
 	aim_angle = 0.0 if facing == 1 else PI

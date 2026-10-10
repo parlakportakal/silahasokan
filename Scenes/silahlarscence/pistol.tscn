@@ -7,9 +7,10 @@
 [node name="pistol" type="Node2D" unique_id=263644930]
 script = ExtResource("1_xsm3s")
 bullet_scene = ExtResource("2_dud2g")
-fire_rate = 0.7
+fire_rate = 0.1
 automatic = true
-player_knockback = 1000.0
+player_knockback = 100.0
+air_knockback_multiplier = 1.5
 
 [node name="Sprite2D" type="Sprite2D" parent="." unique_id=1737864667]
 scale = Vector2(0.04819278, 0.048192773)
