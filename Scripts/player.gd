@@ -103,9 +103,9 @@ func _update_timers(delta: float) -> void:
 
 	if Input.is_action_just_pressed("zipla"):
 		jump_buffer_timer = jump_buffer_time  # Tuşa basıldığını hatırla
-	if Input.is_action_just_pressed("saga"):
+	if Input.is_action_pressed("saga"):
 		$Sprite2D.flip_h = false
-	if Input.is_action_just_pressed("sola"):
+	if Input.is_action_pressed("sola"):
 		$Sprite2D.flip_h = true
 
 # -----------------------------------------------------
