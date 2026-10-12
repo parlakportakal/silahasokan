@@ -1,50 +1,27 @@
 extends Area2D
 
-# Sahne yapısı:
-# Bullet (Area2D)  <- bu script burada
-# ├── Sprite2D
-# └── CollisionShape2D
-
-# =====================================================
-#  AYARLAR
-# =====================================================
-
-## Mermi hızı (piksel/saniye)
-@export var speed: float = 700.0
-## Mermi kaç saniye sonra kendiliğinden yok olsun
+@export var speed: float = 900.0
+@export var damage: float = 5.0
+@export var knockback: float = 250.0
 @export var lifetime: float = 2.0
-## Çarptığı şeye verdiği hasar
-@export var damage: int = 1
+## Knockback yönünü yukarı eğer, oyuncuyu havaya kaldırır
+@export var launch_angle_degrees: float = 15.0
 
-# =====================================================
-#  İÇ DEĞİŞKENLER
-# =====================================================
-
-var direction: Vector2 = Vector2.RIGHT  # Silah tarafından atanır
-var age: float = 0.0
-
+var direction: Vector2 = Vector2.RIGHT
+var shooter: Node = null
 
 func _ready() -> void:
 	body_entered.connect(_on_body_entered)
-
+	get_tree().create_timer(lifetime).timeout.connect(queue_free)
 
 func _physics_process(delta: float) -> void:
-	# Düz çizgide ilerle
-	global_position += direction * speed * delta
+	position += direction * speed * delta
 
-	# Süresi dolunca yok ol
-	age += delta
-	if age >= lifetime:
-		queue_free()
-
-
-func _on_body_entered(body: Node2D) -> void:
-	# Kendi karakterine çarpıp yok olmasın
-	if body.is_in_group("player"):
+func _on_body_entered(body: Node) -> void:
+	if body == shooter:
 		return
-
-	# Çarptığı şeyde take_damage(miktar) fonksiyonu varsa hasar ver
-	if body.has_method("take_damage"):
-		body.take_damage(damage)
-
-	queue_free()
+	if body.has_method("apply_hit"):
+		# Sağa giden mermide -açı, sola gidende +açı = hep yukarı eğilir
+		var hit_dir := direction.rotated(-deg_to_rad(launch_angle_degrees) * signf(direction.x))
+		body.apply_hit(damage, knockback, hit_dir)
+	queue_free()  # oyuncuya veya duvara çarpınca yok ol

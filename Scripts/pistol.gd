@@ -1,30 +1,14 @@
 extends Node2D
 
-# Sahne yapısı:
-# Gun (Node2D)  <- bu script burada, pivot noktası = karakterin eli
-# ├── Sprite2D  <- silah görseli (namlu SAĞA baksın)
-# └── Marker2D  <- adı "Muzzle", namlunun ucuna koy
-
-# =====================================================
-#  AYARLAR (Inspector'dan da değiştirebilirsin)
-# =====================================================
-
 @export_group("Ateş")
-## Ateşlenecek mermi sahnesi (bullet.tscn'i buraya sürükle)
 @export var bullet_scene: PackedScene
-## İki atış arası bekleme süresi (saniye, küçük = daha hızlı ateş)
 @export var fire_rate: float = 0.2
-## true: sol tık basılı tutunca sürekli ateş eder
 @export var automatic: bool = false
-## Merminin sapma açısı (derece, 0 = tam nişan)
 @export var spread_degrees: float = 0.0
 
 @export_group("Tepme")
-## Tepmede silahın yukarı kalkma açısı (derece)
 @export var recoil_angle_degrees: float = 25.0
-## Tepmenin tepe noktasına çıkma süresi (saniye, küçük = sert vuruş)
 @export var recoil_kick_time: float = 0.04
-## Silahın eski haline dönme süresi (saniye)
 @export var recoil_recover_time: float = 0.15
 ## Tepmede silahın geriye kayma mesafesi (piksel, 0 = kapalı)
 @export var kickback_distance: float = 4.0

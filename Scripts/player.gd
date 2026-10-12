@@ -1,66 +1,39 @@
 extends CharacterBody2D
 
-# =====================================================
-#  AYARLAR (Inspector'dan da değiştirebilirsin)
-# =====================================================
-
+#region ayarlar
 @export_group("Yatay Hareket")
-## Maksimum yürüme hızı (piksel/saniye)
 @export var max_speed: float = 220.0
-## Hızlanma: ne kadar hızlı max hıza ulaşır (büyük = daha sert/çabuk)
 @export var acceleration: float = 1400.0
-## Yerde sürtünme: tuşu bırakınca ne kadar çabuk durur (büyük = hemen durur)
 @export var friction: float = 1800.0
-## Havada kontrol: havadayken yön değiştirme gücü (0-1 arası çarpan)
 @export_range(0.0, 1.0) var air_control: float = 0.6
-## Ters yöne basınca uygulanan hızlanma (büyük = anında dönüş, Celeste hissi)
 @export var turn_acceleration: float = 3200.0
-## Zıplarken ters yöne basılıysa hızı anında o yöne çevir (true = çok keskin dönüş)
 @export var flip_speed_on_jump: bool = true
-## flip_speed_on_jump açıkken çevrilen hızın max_speed'e oranı (1.0 = tam hız)
-@export_range(0.0, 1.0) var flip_speed_ratio: float = 1.0
+@export_range(0.0, 1.0) var flip_speed_ratio: float = 0.8
 
 @export_group("Zıplama")
-## Zıplama gücü (yukarı yöndeki ilk hız)
 @export var jump_velocity: float = -420.0
-## Tuşu erken bırakınca zıplamanın kesilme oranı (küçük = daha kısa zıplama)
 @export_range(0.0, 1.0) var jump_cut: float = 0.4
-## Yerden düştükten sonra hâlâ zıplayabileceğin süre (saniye)
 @export var coyote_time: float = 0.1
-## Yere değmeden hemen önce basılan zıplama tuşunu hatırlama süresi (saniye)
 @export var jump_buffer_time: float = 0.1
-## Toplam zıplama sayısı (1 = normal, 2 = çift zıplama)
 @export var max_jumps: int = 2
 
 @export_group("Yerçekimi")
-## Normal yerçekimi
 @export var gravity: float = 1100.0
-## Düşerken uygulanan ekstra çarpan (daha "ağır" düşüş hissi verir)
 @export var fall_gravity_multiplier: float = 1.5
-## Maksimum düşme hızı
 @export var max_fall_speed: float = 700.0
 
 @export_group("Yere İniş")
-## true: yere değince yatay hız sıfırlanır (kayma olmaz)
-## false: hız korunur, normal sürtünmeyle yavaşlar (Celeste hissi)
 @export var reset_slide_on_land: bool = false
-## true: tuşa basıyor olsan bile iner inmez hız sıfırlanır
-## false: sadece tuşu bırakmışsan sıfırlanır (koşarken akıcılık bozulmaz)
 @export var reset_even_when_holding: bool = false
-
-# =====================================================
-#  İÇ DEĞİŞKENLER (genelde dokunmana gerek yok)
-# =====================================================
 
 var coyote_timer: float = 0.0       # Kenardan düştükten sonra kalan "bonus" süre
 var jump_buffer_timer: float = 0.0  # Zıplama tuşuna basıldıktan sonra kalan süre
 var jumps_left: int = 0             # Kalan zıplama hakkı
 var can_cut_jump: bool = false      # Bu zıplama tuş bırakılınca kısalabilir mi?
-
+#endregion
 
 func _physics_process(delta: float) -> void:
-	var was_on_floor := is_on_floor()  # Bu karedeki başlangıç durumu
-	# kralinyo sağ sol yaparken dönerken
+	var was_on_floor := is_on_floor() 
 
 	_update_timers(delta)
 	_apply_gravity(delta)
@@ -68,7 +41,6 @@ func _physics_process(delta: float) -> void:
 	_handle_horizontal(delta)
 	move_and_slide()  # Hareketi uygular ve çarpışmaları halleder
 
-	# Havadan yere yeni indiysek
 	if is_on_floor() and not was_on_floor:
 		_on_landed()
 
@@ -80,14 +52,9 @@ func _on_landed() -> void:
 		return
 
 	var direction := Input.get_axis("sola", "saga")
-	# Tuş bırakılmışsa (veya ayar açıksa) kaymayı sıfırla
 	if direction == 0.0 or reset_even_when_holding:
 		velocity.x = 0.0
 
-
-# -----------------------------------------------------
-#  Sayaçlar: coyote time ve jump buffer
-# -----------------------------------------------------
 func _update_timers(delta: float) -> void:
 	if is_on_floor():
 		coyote_timer = coyote_time   # Yerdeyken sayaç sürekli dolu

@@ -9,7 +9,9 @@ height = 42.0
 
 [node name="player" type="CharacterBody2D" unique_id=824720089]
 script = ExtResource("1_cvnsp")
+max_speed = 500.0
 air_control = 0.4
+flip_speed_ratio = 1.0
 jump_velocity = -429.43
 gravity = 1800.0
 fall_gravity_multiplier = 2.0
