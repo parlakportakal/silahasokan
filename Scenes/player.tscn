@@ -1,6 +1,6 @@
 [gd_scene format=3 uid="uid://cmtgnb445pe26"]
 
-[ext_resource type="Script" uid="uid://cdgno3eyrf4hu" path="res://Scripts/player.gd" id="1_cvnsp"]
+[ext_resource type="Script" uid="uid://m84y8etnbkqj" path="res://playeranlık.gd" id="1_cvnsp"]
 [ext_resource type="Texture2D" uid="uid://b6o1e3lxbla3e" path="res://Assets/och.png" id="2_cvnsp"]
 
 [sub_resource type="CapsuleShape2D" id="CapsuleShape2D_g4v7s"]
@@ -9,12 +9,6 @@ height = 42.0
 
 [node name="player" type="CharacterBody2D" unique_id=824720089]
 script = ExtResource("1_cvnsp")
-max_speed = 500.0
-air_control = 0.4
-flip_speed_ratio = 1.0
-jump_velocity = -429.43
-gravity = 1800.0
-fall_gravity_multiplier = 2.0
 
 [node name="Sprite2D" type="Sprite2D" parent="." unique_id=721585257]
 position = Vector2(0, -1.508503)

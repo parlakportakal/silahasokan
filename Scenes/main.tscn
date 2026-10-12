@@ -30,12 +30,14 @@ scale = Vector2(0.120000005, 1)
 position = Vector2(492, 274)
 scale = Vector2(0.120000005, 1)
 
+[node name="PLATFORM7" parent="PLATFORMLAR" unique_id=1923722368 instance=ExtResource("1_bo1nx")]
+position = Vector2(496.00003, 325)
+rotation = -0.69266117
+scale = Vector2(0.5450617, 1)
+
 [node name="PLATFORM6" parent="PLATFORMLAR" unique_id=1956561074 instance=ExtResource("1_bo1nx")]
 position = Vector2(662, 274)
 scale = Vector2(0.120000005, 1)
-
-[node name="player" parent="PLATFORMLAR" unique_id=824720089 instance=ExtResource("2_8gbba")]
-position = Vector2(554, 333)
 
 [node name="player" parent="." unique_id=1857629448 instance=ExtResource("2_8gbba")]
 position = Vector2(404, 338)
