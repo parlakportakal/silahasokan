@@ -38,7 +38,7 @@ func _physics_process(delta: float) -> void:
 		set_collision_mask_value(1, false)
 		await get_tree().create_timer(1.2)
 		set_collision_mask_value(1, true)
-	
+	## soksok
 	
 	
 	if Input.is_action_pressed("saga"):
