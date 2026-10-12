@@ -3,6 +3,9 @@ extends CharacterBody2D
 var speed = 500
 var jump_force = 200
 var gravity = 980
+var acceleration = 2540
+var friction = 2500
+
 
 ##selam bunu yazan piç
 
@@ -18,9 +21,6 @@ func _physics_process(delta: float) -> void:
 		velocity.y = -jump_force
 	
 	
-	
-	
-	
 	if Input.is_action_pressed("saga"):
 		direction.x += 1
 	if Input.is_action_pressed("sola"):
@@ -33,5 +33,11 @@ func _physics_process(delta: float) -> void:
 		$Sprite2D.flip_h = false
 	
 	
-	velocity.x = direction.x * speed
+	if direction.x != 0:
+		velocity.x = move_toward(velocity.x , direction.x * speed, acceleration * delta)
+	else:
+		velocity.x = move_toward(velocity.x , 0 , friction * delta)
+	velocity.x = clamp(velocity.x, -speed, speed)
+	
+	
 	move_and_slide()

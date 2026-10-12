@@ -47,8 +47,7 @@ position = Vector2(16, 25)
 offset = Vector2(0, -75)
 ignore_rotation = false
 zoom = Vector2(1.68, 1.68)
-position_smoothing_enabled = true
-position_smoothing_speed = 2.0
+position_smoothing_speed = 12.855
 
 [node name="pistol" parent="player" unique_id=263644930 instance=ExtResource("4_jjvhh")]
 position = Vector2(15, 2)
