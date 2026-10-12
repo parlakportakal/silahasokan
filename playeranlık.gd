@@ -35,10 +35,9 @@ func _physics_process(delta: float) -> void:
 		velocity.y = -jump_force
 ##sikik
 	if Input.is_action_just_pressed("asagi") and is_on_floor():
-		set_collision_mask_value(1, false)
-		await get_tree().create_timer(1.2)
-		set_collision_mask_value(1, true)
-	## soksok
+		set_collision_mask_value(2, false)
+		await get_tree().create_timer(0.2).timeout
+		set_collision_mask_value(2, true)
 	
 	
 	if Input.is_action_pressed("saga"):
