@@ -33,7 +33,7 @@ func _physics_process(delta: float) -> void:
 	if Input.is_action_just_pressed("zipla") and jump_count <  max_jump:
 		jump_count += 1
 		velocity.y = -jump_force
-
+##sikik
 	if Input.is_action_just_pressed("asagi") and is_on_floor():
 		set_collision_mask_value(1, false)
 		await get_tree().create_timer(1.2)
