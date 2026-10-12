@@ -2,8 +2,9 @@ extends CharacterBody2D
 
 var speed = 500
 var jump_force = 200
-var gravity = 980 
+var gravity = 980
 
+##selam bunu yazan piç
 
 func _physics_process(delta: float) -> void:
 	var direction = Vector2.ZERO
@@ -31,7 +32,6 @@ func _physics_process(delta: float) -> void:
 	if direction.x > 0:
 		$Sprite2D.flip_h = false
 	
-
 	
 	velocity.x = direction.x * speed
 	move_and_slide()
