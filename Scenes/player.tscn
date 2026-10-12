@@ -17,3 +17,5 @@ texture = ExtResource("2_cvnsp")
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="." unique_id=668489652]
 shape = SubResource("CapsuleShape2D_g4v7s")
+
+[node name="cayotetimer" type="Timer" parent="." unique_id=1769407294]
