@@ -2,55 +2,110 @@
 
 [ext_resource type="Script" uid="uid://b0rl2noq8ga8i" path="res://Scripts/main.gd" id="1_8gbba"]
 [ext_resource type="PackedScene" uid="uid://835xbk7lq8cw" path="res://Scenes/platform.tscn" id="1_bo1nx"]
+[ext_resource type="Texture2D" uid="uid://bh0tjdsqq6gpf" path="res://Assets/civirzivir/arkaplan.png" id="2_6bp64"]
 [ext_resource type="PackedScene" uid="uid://cmtgnb445pe26" path="res://Scenes/player.tscn" id="2_8gbba"]
 [ext_resource type="PackedScene" uid="uid://bgld8x6dlgami" path="res://Scenes/silahlarscence/pistol.tscn" id="4_jjvhh"]
 [ext_resource type="PackedScene" uid="uid://bf6niddbhclxo" path="res://Scenes/mermi.tscn" id="5_kry3j"]
+[ext_resource type="Texture2D" uid="uid://26whi1h644ba" path="res://Assets/civirzivir/perde.png" id="7_344ge"]
+[ext_resource type="Texture2D" uid="uid://br5ub5r0t6is5" path="res://Assets/civirzivir/perde2.png" id="8_344ge"]
 
 [node name="main" type="Node2D" unique_id=2134541721]
 script = ExtResource("1_8gbba")
 
+[node name="Arkaplan" type="Sprite2D" parent="." unique_id=1907234395]
+position = Vector2(563, 310.00003)
+scale = Vector2(1.6236501, 1.6236501)
+texture = ExtResource("2_6bp64")
+
 [node name="PLATFORMLAR" type="Node" parent="." unique_id=374862151]
 
-[node name="PLATFORM" parent="PLATFORMLAR" unique_id=1875693618 instance=ExtResource("1_bo1nx")]
-position = Vector2(503, 370)
-scale = Vector2(11.479998, 1)
-
-[node name="PLATFORM2" parent="PLATFORMLAR" unique_id=1868514009 instance=ExtResource("1_bo1nx")]
-position = Vector2(335, 496)
-
-[node name="PLATFORM3" parent="PLATFORMLAR" unique_id=1412163715 instance=ExtResource("1_bo1nx")]
-position = Vector2(176, 274)
-scale = Vector2(0.120000005, 1)
-
-[node name="PLATFORM4" parent="PLATFORMLAR" unique_id=995882973 instance=ExtResource("1_bo1nx")]
-position = Vector2(330, 274)
-scale = Vector2(0.120000005, 1)
-
-[node name="PLATFORM5" parent="PLATFORMLAR" unique_id=1944564951 instance=ExtResource("1_bo1nx")]
-position = Vector2(492, 274)
-scale = Vector2(0.120000005, 1)
-
-[node name="PLATFORM7" parent="PLATFORMLAR" unique_id=1923722368 instance=ExtResource("1_bo1nx")]
-position = Vector2(496.00003, 325)
-rotation = -0.69266117
-scale = Vector2(0.5450617, 1)
-
 [node name="PLATFORM6" parent="PLATFORMLAR" unique_id=1956561074 instance=ExtResource("1_bo1nx")]
-position = Vector2(662, 274)
-scale = Vector2(0.120000005, 1)
+position = Vector2(260, 381.00003)
+rotation = 0.017179232
+scale = Vector2(0.6503712, 1.0155843)
+
+[node name="PLATFORM7" parent="PLATFORMLAR" unique_id=1875693618 instance=ExtResource("1_bo1nx")]
+position = Vector2(556, 219.00003)
+rotation = 0.003840969
+scale = Vector2(0.23111154, 0.788217)
+
+[node name="PLATFORM17" parent="PLATFORMLAR" unique_id=1522590111 instance=ExtResource("1_bo1nx")]
+position = Vector2(556, 219.00003)
+rotation = 0.003840969
+scale = Vector2(0.23111154, 0.788217)
+
+[node name="PLATFORM16" parent="PLATFORMLAR" unique_id=45553058 instance=ExtResource("1_bo1nx")]
+position = Vector2(756, 17)
+rotation = 0.003840969
+scale = Vector2(0.23111154, 0.788217)
+
+[node name="PLATFORM8" parent="PLATFORMLAR" unique_id=323929823 instance=ExtResource("1_bo1nx")]
+position = Vector2(758, 232)
+rotation = -0.01156584
+scale = Vector2(0.23111154, 0.788217)
+
+[node name="PLATFORM9" parent="PLATFORMLAR" unique_id=1264084822 instance=ExtResource("1_bo1nx")]
+position = Vector2(756.99994, 339.99997)
+rotation = 0.009819103
+scale = Vector2(0.23111154, 0.788217)
+
+[node name="PLATFORM10" parent="PLATFORMLAR" unique_id=455344758 instance=ExtResource("1_bo1nx")]
+position = Vector2(990.99994, 179.00002)
+rotation = 0.0030467832
+scale = Vector2(0.29727802, 0.70116)
+
+[node name="PLATFORM11" parent="PLATFORMLAR" unique_id=1303109712 instance=ExtResource("1_bo1nx")]
+position = Vector2(991, 13)
+rotation = 0.0013437796
+scale = Vector2(0.31650713, 0.699934)
+
+[node name="PLATFORM12" parent="PLATFORMLAR" unique_id=1938322523 instance=ExtResource("1_bo1nx")]
+position = Vector2(988.99994, 308.00003)
+rotation = -0.00489458
+scale = Vector2(0.30218166, 0.5153067)
+
+[node name="PLATFORM13" parent="PLATFORMLAR" unique_id=691248361 instance=ExtResource("1_bo1nx")]
+position = Vector2(993.99994, 421.00003)
+rotation = -0.00489458
+scale = Vector2(0.2686869, 0.44450063)
+
+[node name="PLATFORM14" parent="PLATFORMLAR" unique_id=446709257 instance=ExtResource("1_bo1nx")]
+position = Vector2(562, 613)
+rotation = -0.0027981626
+scale = Vector2(1.834506, 0.47930914)
+
+[node name="PLATFORM15" parent="PLATFORMLAR" unique_id=857479818 instance=ExtResource("1_bo1nx")]
+position = Vector2(261, 26)
+rotation = 0.0045252843
+scale = Vector2(0.7228227, 0.5129696)
 
 [node name="player" parent="." unique_id=1857629448 instance=ExtResource("2_8gbba")]
 position = Vector2(404, 338)
 
-[node name="Camera2D" type="Camera2D" parent="player" unique_id=237960700]
-position = Vector2(16, 25)
-offset = Vector2(0, -75)
-ignore_rotation = false
-zoom = Vector2(1.68, 1.68)
-position_smoothing_speed = 12.855
-
 [node name="pistol" parent="player" unique_id=263644930 instance=ExtResource("4_jjvhh")]
 position = Vector2(15, 2)
 
+[node name="Camera2D" type="Camera2D" parent="player" unique_id=237960700]
+position = Vector2(165, 62)
+scale = Vector2(2.268849, 1.3246347)
+offset = Vector2(0, -75)
+ignore_rotation = false
+zoom = Vector2(2.96, 2.96)
+limit_left = -28
+limit_top = 13
+limit_right = 1165
+limit_bottom = 793
+position_smoothing_speed = 12.855
+
 [node name="mermi" parent="." unique_id=1313714118 instance=ExtResource("5_kry3j")]
 position = Vector2(431, 337)
+
+[node name="Perde" type="Sprite2D" parent="." unique_id=1071804381]
+position = Vector2(567, 313.00003)
+scale = Vector2(1.6389999, 1.6389999)
+texture = ExtResource("7_344ge")
+
+[node name="Perde2" type="Sprite2D" parent="Perde" unique_id=394381367]
+position = Vector2(-3.6607666, -1.2202759)
+scale = Vector2(1.029279, 1.029279)
+texture = ExtResource("8_344ge")

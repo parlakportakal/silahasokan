@@ -1,10 +1,10 @@
 [gd_scene format=3 uid="uid://cmtgnb445pe26"]
 
 [ext_resource type="Script" uid="uid://m84y8etnbkqj" path="res://playeranlık.gd" id="1_cvnsp"]
-[ext_resource type="Texture2D" uid="uid://b6o1e3lxbla3e" path="res://Assets/och.png" id="2_cvnsp"]
+[ext_resource type="Texture2D" uid="uid://w3bjah5ctu1k" path="res://Assets/civirzivir/soap.png" id="2_cvnsp"]
 
 [sub_resource type="CapsuleShape2D" id="CapsuleShape2D_g4v7s"]
-radius = 15.0
+radius = 12.0
 height = 42.0
 
 [node name="player" type="CharacterBody2D" unique_id=824720089]
@@ -12,8 +12,9 @@ collision_mask = 3
 script = ExtResource("1_cvnsp")
 
 [node name="Sprite2D" type="Sprite2D" parent="." unique_id=721585257]
-position = Vector2(0, -1.508503)
-scale = Vector2(0.13492063, 0.12942973)
+position = Vector2(0.99999994, 0)
+rotation = -1.5707964
+scale = Vector2(0.12615554, 0.12249789)
 texture = ExtResource("2_cvnsp")
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="." unique_id=668489652]
