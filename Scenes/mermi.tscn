@@ -1,16 +1,18 @@
 [gd_scene format=3 uid="uid://bf6niddbhclxo"]
 
 [ext_resource type="Script" uid="uid://br7m61nq1u27m" path="res://Scripts/mermi.gd" id="1_06o81"]
+[ext_resource type="Texture2D" uid="uid://o5ewjmhptxrl" path="res://Assets/mermigecici.png" id="2_06o81"]
 
-[sub_resource type="RectangleShape2D" id="RectangleShape2D_orvw2"]
-size = Vector2(3.425, 1.365)
+[sub_resource type="CapsuleShape2D" id="CapsuleShape2D_8k338"]
 
-[node name="mermi" type="Area2D" unique_id=1313714118]
+[node name="Area2D" type="Area2D" unique_id=1992895749]
 script = ExtResource("1_06o81")
 
-[node name="CollisionShape2D" type="CollisionShape2D" parent="." unique_id=1062708138]
-shape = SubResource("RectangleShape2D_orvw2")
+[node name="Sprite2D" type="Sprite2D" parent="." unique_id=457585493]
+texture = ExtResource("2_06o81")
 
-[node name="Sprite2D" type="Sprite2D" parent="." unique_id=1382471607]
+[node name="CollisionShape2D" type="CollisionShape2D" parent="." unique_id=2006451147]
+position = Vector2(22, -0.99999994)
 rotation = 1.5707964
-scale = Vector2(0.042658187, 0.042658176)
+scale = Vector2(1.4068314, 3.3553486)
+shape = SubResource("CapsuleShape2D_8k338")

@@ -5,7 +5,6 @@
 [ext_resource type="Texture2D" uid="uid://bh0tjdsqq6gpf" path="res://Assets/civirzivir/arkaplan.png" id="2_6bp64"]
 [ext_resource type="PackedScene" uid="uid://cmtgnb445pe26" path="res://Scenes/player.tscn" id="2_8gbba"]
 [ext_resource type="PackedScene" uid="uid://bgld8x6dlgami" path="res://Scenes/pistol.tscn" id="4_jjvhh"]
-[ext_resource type="PackedScene" uid="uid://bf6niddbhclxo" path="res://Scenes/mermi.tscn" id="5_kry3j"]
 [ext_resource type="Texture2D" uid="uid://26whi1h644ba" path="res://Assets/civirzivir/perde.png" id="7_344ge"]
 [ext_resource type="Texture2D" uid="uid://br5ub5r0t6is5" path="res://Assets/civirzivir/perde2.png" id="8_344ge"]
 
@@ -82,9 +81,6 @@ scale = Vector2(0.7228227, 0.5129696)
 [node name="player" parent="." unique_id=1857629448 instance=ExtResource("2_8gbba")]
 position = Vector2(404, 338)
 
-[node name="pistol" parent="player" unique_id=263644930 instance=ExtResource("4_jjvhh")]
-position = Vector2(15, 2)
-
 [node name="Camera2D" type="Camera2D" parent="player" unique_id=237960700]
 position = Vector2(165, 62)
 scale = Vector2(2.268849, 1.3246347)
@@ -97,8 +93,8 @@ limit_right = 1165
 limit_bottom = 793
 position_smoothing_speed = 12.855
 
-[node name="mermi" parent="." unique_id=1313714118 instance=ExtResource("5_kry3j")]
-position = Vector2(431, 337)
+[node name="pistol" parent="player" unique_id=263644930 instance=ExtResource("4_jjvhh")]
+position = Vector2(16, 3)
 
 [node name="Perde" type="Sprite2D" parent="." unique_id=1071804381]
 position = Vector2(567, 313.00003)

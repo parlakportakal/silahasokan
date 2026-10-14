@@ -1,7 +1,7 @@
 [gd_scene format=3 uid="uid://cmtgnb445pe26"]
 
 [ext_resource type="Script" uid="uid://m84y8etnbkqj" path="res://Scripts/playeranlık.gd" id="1_cvnsp"]
-[ext_resource type="Texture2D" uid="uid://w3bjah5ctu1k" path="res://Assets/civirzivir/soap.png" id="2_cvnsp"]
+[ext_resource type="Texture2D" uid="uid://dy48rwqreyjuc" path="res://Assets/civirzivir/mymoon.png" id="2_cvnsp"]
 
 [sub_resource type="CapsuleShape2D" id="CapsuleShape2D_g4v7s"]
 radius = 12.0
@@ -12,12 +12,13 @@ collision_mask = 3
 script = ExtResource("1_cvnsp")
 
 [node name="Sprite2D" type="Sprite2D" parent="." unique_id=721585257]
-position = Vector2(0.99999994, 0)
-rotation = -1.5707964
-scale = Vector2(0.12615554, 0.12249789)
+position = Vector2(0, -9)
+scale = Vector2(0.22350387, 0.21702379)
 texture = ExtResource("2_cvnsp")
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="." unique_id=668489652]
+position = Vector2(0, 1)
+scale = Vector2(0.9819746, 0.85012645)
 shape = SubResource("CapsuleShape2D_g4v7s")
 
 [node name="cayotetimer" type="Timer" parent="." unique_id=1769407294]
