@@ -1,6 +1,6 @@
 [gd_scene format=3 uid="uid://cmtgnb445pe26"]
 
-[ext_resource type="Script" uid="uid://m84y8etnbkqj" path="res://playeranlık.gd" id="1_cvnsp"]
+[ext_resource type="Script" uid="uid://m84y8etnbkqj" path="res://Scripts/playeranlık.gd" id="1_cvnsp"]
 [ext_resource type="Texture2D" uid="uid://w3bjah5ctu1k" path="res://Assets/civirzivir/soap.png" id="2_cvnsp"]
 
 [sub_resource type="CapsuleShape2D" id="CapsuleShape2D_g4v7s"]

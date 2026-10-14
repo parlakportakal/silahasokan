@@ -4,7 +4,7 @@
 [ext_resource type="PackedScene" uid="uid://835xbk7lq8cw" path="res://Scenes/platform.tscn" id="1_bo1nx"]
 [ext_resource type="Texture2D" uid="uid://bh0tjdsqq6gpf" path="res://Assets/civirzivir/arkaplan.png" id="2_6bp64"]
 [ext_resource type="PackedScene" uid="uid://cmtgnb445pe26" path="res://Scenes/player.tscn" id="2_8gbba"]
-[ext_resource type="PackedScene" uid="uid://bgld8x6dlgami" path="res://Scenes/silahlarscence/pistol.tscn" id="4_jjvhh"]
+[ext_resource type="PackedScene" uid="uid://bgld8x6dlgami" path="res://Scenes/pistol.tscn" id="4_jjvhh"]
 [ext_resource type="PackedScene" uid="uid://bf6niddbhclxo" path="res://Scenes/mermi.tscn" id="5_kry3j"]
 [ext_resource type="Texture2D" uid="uid://26whi1h644ba" path="res://Assets/civirzivir/perde.png" id="7_344ge"]
 [ext_resource type="Texture2D" uid="uid://br5ub5r0t6is5" path="res://Assets/civirzivir/perde2.png" id="8_344ge"]
