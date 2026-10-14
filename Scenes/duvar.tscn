@@ -1,0 +1,11 @@
+[gd_scene format=3 uid="uid://cm10pumbey81a"]
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_yf5fn"]
+
+[node name="StaticBody2D" type="StaticBody2D" unique_id=853807131]
+collision_mask = 3
+
+[node name="Sprite2D" type="Sprite2D" parent="." unique_id=1862619946]
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="." unique_id=676025252]
+shape = SubResource("RectangleShape2D_yf5fn")

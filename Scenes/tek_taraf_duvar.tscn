@@ -1,0 +1,9 @@
+[gd_scene format=3 uid="uid://cnofcfbkhrvum"]
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_yf5fn"]
+
+[node name="tek taraf duvar" type="StaticBody2D" unique_id=1153759225]
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="." unique_id=1685013300]
+shape = SubResource("RectangleShape2D_yf5fn")
+one_way_collision = true

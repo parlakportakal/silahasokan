@@ -5,20 +5,17 @@ var jump_force = 400
 var gravity = 980
 var acceleration = 2540
 var friction = 2500
-var turn_multiplier
 var jump_count= 0
 var max_jump = 2
-
-##selam bunu yazan piç
+var buffertime = 0.1
+var buffercounter = 0.0
 
 func _physics_process(delta: float) -> void:
 	var direction = Vector2.ZERO
 	
-	
-	if direction.x != 0:
-		var accel = acceleration
-	
-	
+	if Input.is_action_just_pressed("zipla"):
+		buffercounter = buffertime
+	buffercounter = max(buffercounter - delta , 0.0)
 	
 	
 	
@@ -30,9 +27,10 @@ func _physics_process(delta: float) -> void:
 		$cayotetimer.start()
 	if $cayotetimer.is_stopped() and jump_count == 0:
 		jump_count = 1
-	if Input.is_action_just_pressed("zipla") and jump_count <  max_jump:
+	if buffercounter > 0 and jump_count <  max_jump:
 		jump_count += 1
 		velocity.y = -jump_force
+		buffercounter = 0
 ##sikik
 	if Input.is_action_just_pressed("asagi") and is_on_floor():
 		set_collision_mask_value(2, false)

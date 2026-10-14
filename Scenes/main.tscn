@@ -6,8 +6,10 @@
 [ext_resource type="PackedScene" uid="uid://cmtgnb445pe26" path="res://Scenes/player.tscn" id="2_8gbba"]
 [ext_resource type="PackedScene" uid="uid://bgld8x6dlgami" path="res://Scenes/pistol.tscn" id="4_jjvhh"]
 [ext_resource type="PackedScene" uid="uid://bf6niddbhclxo" path="res://Scenes/mermi.tscn" id="5_kry3j"]
+[ext_resource type="PackedScene" uid="uid://cm10pumbey81a" path="res://Scenes/duvar.tscn" id="6_ynf5e"]
 [ext_resource type="Texture2D" uid="uid://26whi1h644ba" path="res://Assets/civirzivir/perde.png" id="7_344ge"]
 [ext_resource type="Texture2D" uid="uid://br5ub5r0t6is5" path="res://Assets/civirzivir/perde2.png" id="8_344ge"]
+[ext_resource type="PackedScene" uid="uid://cnofcfbkhrvum" path="res://Scenes/tek_taraf_duvar.tscn" id="10_hptm8"]
 
 [node name="main" type="Node2D" unique_id=2134541721]
 script = ExtResource("1_8gbba")
@@ -18,11 +20,6 @@ scale = Vector2(1.6236501, 1.6236501)
 texture = ExtResource("2_6bp64")
 
 [node name="PLATFORMLAR" type="Node" parent="." unique_id=374862151]
-
-[node name="PLATFORM6" parent="PLATFORMLAR" unique_id=1956561074 instance=ExtResource("1_bo1nx")]
-position = Vector2(260, 381.00003)
-rotation = 0.017179232
-scale = Vector2(0.6503712, 1.0155843)
 
 [node name="PLATFORM7" parent="PLATFORMLAR" unique_id=1875693618 instance=ExtResource("1_bo1nx")]
 position = Vector2(556, 219.00003)
@@ -69,11 +66,6 @@ position = Vector2(993.99994, 421.00003)
 rotation = -0.00489458
 scale = Vector2(0.2686869, 0.44450063)
 
-[node name="PLATFORM14" parent="PLATFORMLAR" unique_id=446709257 instance=ExtResource("1_bo1nx")]
-position = Vector2(562, 613)
-rotation = -0.0027981626
-scale = Vector2(1.834506, 0.47930914)
-
 [node name="PLATFORM15" parent="PLATFORMLAR" unique_id=857479818 instance=ExtResource("1_bo1nx")]
 position = Vector2(261, 26)
 rotation = 0.0045252843
@@ -109,3 +101,24 @@ texture = ExtResource("7_344ge")
 position = Vector2(-3.6607666, -1.2202759)
 scale = Vector2(1.029279, 1.029279)
 texture = ExtResource("8_344ge")
+
+[node name="duvarlar" type="Node" parent="." unique_id=418663318]
+
+[node name="StaticBody2D" parent="." unique_id=853807131 instance=ExtResource("6_ynf5e")]
+position = Vector2(257, 380)
+rotation = 0.015433997
+scale = Vector2(21.943403, -1.2291486)
+
+[node name="tek taraf duvar" parent="." unique_id=1153759225 instance=ExtResource("10_hptm8")]
+position = Vector2(1078, 485)
+rotation = 1.5840542
+scale = Vector2(5.99187, 0.7210742)
+
+[node name="tek taraf duvar2" parent="." unique_id=1458500552 instance=ExtResource("10_hptm8")]
+position = Vector2(901.00006, 485)
+rotation = 4.695356
+scale = Vector2(5.99187, 0.7210742)
+
+[node name="StaticBody2D2" parent="." unique_id=729168941 instance=ExtResource("6_ynf5e")]
+position = Vector2(539, 650.00006)
+scale = Vector2(67.29026, 4.0251107)
