@@ -9,6 +9,10 @@ var jump_count = 0
 var max_jump = 2
 var buffertime = 0.1
 var buffercounter = 0.0
+var wall_coyote_time  = 0.12
+var wall_coyote_counter = 0.0
+var last_wall_side = 0  # Sol: -1, sağ: 1.
+var last_wall_jump_side = 0
 
 
 func _physics_process(delta: float) -> void:
@@ -17,6 +21,18 @@ func _physics_process(delta: float) -> void:
 	var sag_duvar = $raycastsag.is_colliding()
 	var sol_duvar = $raycastsol.is_colliding()
 	var duvarda = sag_duvar or sol_duvar
+	wall_coyote_counter = maxf(wall_coyote_counter - delta, 0.0)
+	if is_on_floor():
+		last_wall_jump_side = 0
+		last_wall_side = 0
+		wall_coyote_counter = 0.0
+	elif duvarda:
+		# İki duvar aynı anda algılanırsa kullanılabilir karşı tarafı seç.
+		if sag_duvar and (not sol_duvar or last_wall_jump_side != 1):
+			last_wall_side = 1
+		else:
+			last_wall_side = -1
+		wall_coyote_counter = wall_coyote_time
 
 	if Input.is_action_just_pressed("zipla"):
 		buffercounter = buffertime
@@ -34,7 +50,8 @@ func _physics_process(delta: float) -> void:
 
 	# Normal zıplama ve double jump.
 	# Duvara değince bu bölüm jump_count'u değiştirmez.
-	if buffercounter > 0 and jump_count < max_jump and (is_on_floor() or not duvarda):
+	# Tolerans süresinde normal zıplama, duvar zıplamasını tüketmesin.
+	if buffercounter > 0 and jump_count < max_jump and (is_on_floor() or (not duvarda and wall_coyote_counter <= 0.0)):
 		jump_count += 1
 		velocity.y = -jump_force
 		buffercounter = 0
@@ -66,14 +83,12 @@ func _physics_process(delta: float) -> void:
 		velocity.y = min(velocity.y, 90.0)
 
 	# Wall jump
-	if buffercounter > 0 and not is_on_floor():
-		if sag_duvar:
+	if buffercounter > 0 and not is_on_floor() and wall_coyote_counter > 0.0:
+		if last_wall_side != 0 and last_wall_side != last_wall_jump_side:
 			velocity.y = -jump_force
-			velocity.x = -300
-			buffercounter = 0
-		elif sol_duvar:
-			velocity.y = -jump_force
-			velocity.x = 300
+			velocity.x = -last_wall_side * 300
+			last_wall_jump_side = last_wall_side
+			wall_coyote_counter = 0.0
 			buffercounter = 0
 
 	move_and_slide()
