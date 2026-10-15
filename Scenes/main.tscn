@@ -119,6 +119,11 @@ position = Vector2(901.00006, 485)
 rotation = 4.695356
 scale = Vector2(5.99187, 0.7210742)
 
+[node name="tek taraf duvar3" parent="." unique_id=234539641 instance=ExtResource("10_hptm8")]
+position = Vector2(805.00006, 472.00003)
+rotation = 1.4638442
+scale = Vector2(8.391006, 0.66460115)
+
 [node name="StaticBody2D2" parent="." unique_id=729168941 instance=ExtResource("6_ynf5e")]
 position = Vector2(539, 650.00006)
 scale = Vector2(67.29026, 4.0251107)

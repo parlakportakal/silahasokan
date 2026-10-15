@@ -18,6 +18,14 @@ scale = Vector2(0.12615554, 0.12249789)
 texture = ExtResource("2_cvnsp")
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="." unique_id=668489652]
+position = Vector2(1, -5.9604645e-08)
+scale = Vector2(0.9655583, 0.97879726)
 shape = SubResource("CapsuleShape2D_g4v7s")
 
 [node name="cayotetimer" type="Timer" parent="." unique_id=1769407294]
+
+[node name="raycastsol" type="RayCast2D" parent="." unique_id=2121031825]
+target_position = Vector2(-11, 0)
+
+[node name="raycastsag" type="RayCast2D" parent="." unique_id=2103102030]
+target_position = Vector2(13, 0)
