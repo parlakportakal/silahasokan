@@ -8,9 +8,12 @@
 [ext_resource type="PackedScene" uid="uid://bf6niddbhclxo" path="res://Scenes/mermi.tscn" id="5_kry3j"]
 [ext_resource type="PackedScene" uid="uid://cm10pumbey81a" path="res://Scenes/duvar.tscn" id="6_ynf5e"]
 [ext_resource type="Texture2D" uid="uid://26whi1h644ba" path="res://Assets/civirzivir/perde.png" id="7_344ge"]
+[ext_resource type="Script" uid="uid://dkffma8252nv3" path="res://Scripts/camera_2d.gd" id="7_jkdf5"]
 [ext_resource type="Texture2D" uid="uid://br5ub5r0t6is5" path="res://Assets/civirzivir/perde2.png" id="8_344ge"]
 [ext_resource type="PackedScene" uid="uid://cnofcfbkhrvum" path="res://Scenes/tek_taraf_duvar.tscn" id="10_hptm8"]
 [ext_resource type="Script" uid="uid://kcsrp7svk77k" path="res://Scripts/silah_ekseni.gd" id="11_silah_ekseni"]
+[ext_resource type="Texture2D" uid="uid://5bo3psmyfyqo" path="res://Assets/cross.png" id="12_fdnlq"]
+[ext_resource type="Script" uid="uid://bnnbr4wc7j360" path="res://Scripts/crosshair.gd" id="13_jkdf5"]
 
 [node name="main" type="Node2D" unique_id=2134541721]
 script = ExtResource("1_8gbba")
@@ -82,13 +85,14 @@ script = ExtResource("11_silah_ekseni")
 position = Vector2(25, 0)
 
 [node name="Camera2D" type="Camera2D" parent="player" unique_id=237960700]
-zoom = Vector2(2.96, 2.96)
+zoom = Vector2(0.815, 0.815)
 limit_left = -37
 limit_top = -65
 limit_right = 1163
 limit_bottom = 685
 position_smoothing_enabled = true
 position_smoothing_speed = 7.0
+script = ExtResource("7_jkdf5")
 
 [node name="mermi" parent="." unique_id=1313714118 instance=ExtResource("5_kry3j")]
 position = Vector2(431, 337)
@@ -128,3 +132,9 @@ scale = Vector2(8.391006, 0.66460115)
 [node name="StaticBody2D2" parent="." unique_id=729168941 instance=ExtResource("6_ynf5e")]
 position = Vector2(539, 650.00006)
 scale = Vector2(67.29026, 4.0251107)
+
+[node name="crosshair" type="Sprite2D" parent="." unique_id=1739077503]
+scale = Vector2(0.255, 0.255)
+texture = ExtResource("12_fdnlq")
+offset = Vector2(0, -10.15)
+script = ExtResource("13_jkdf5")
