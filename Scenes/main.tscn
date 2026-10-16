@@ -10,6 +10,7 @@
 [ext_resource type="Texture2D" uid="uid://26whi1h644ba" path="res://Assets/civirzivir/perde.png" id="7_344ge"]
 [ext_resource type="Texture2D" uid="uid://br5ub5r0t6is5" path="res://Assets/civirzivir/perde2.png" id="8_344ge"]
 [ext_resource type="PackedScene" uid="uid://cnofcfbkhrvum" path="res://Scenes/tek_taraf_duvar.tscn" id="10_hptm8"]
+[ext_resource type="Script" uid="uid://kcsrp7svk77k" path="res://Scripts/silah_ekseni.gd" id="11_silah_ekseni"]
 
 [node name="main" type="Node2D" unique_id=2134541721]
 script = ExtResource("1_8gbba")
@@ -74,20 +75,20 @@ scale = Vector2(0.7228227, 0.5129696)
 [node name="player" parent="." unique_id=1857629448 instance=ExtResource("2_8gbba")]
 position = Vector2(404, 338)
 
-[node name="pistol" parent="player" unique_id=263644930 instance=ExtResource("4_jjvhh")]
-position = Vector2(15, 2)
+[node name="silaheksen" type="Node2D" parent="player" unique_id=1769057377]
+script = ExtResource("11_silah_ekseni")
+
+[node name="pistol" parent="player/silaheksen" unique_id=263644930 instance=ExtResource("4_jjvhh")]
+position = Vector2(25, 0)
 
 [node name="Camera2D" type="Camera2D" parent="player" unique_id=237960700]
-position = Vector2(165, 62)
-scale = Vector2(2.268849, 1.3246347)
-offset = Vector2(0, -75)
-ignore_rotation = false
 zoom = Vector2(2.96, 2.96)
-limit_left = -28
-limit_top = 13
-limit_right = 1165
-limit_bottom = 793
-position_smoothing_speed = 12.855
+limit_left = -37
+limit_top = -65
+limit_right = 1163
+limit_bottom = 685
+position_smoothing_enabled = true
+position_smoothing_speed = 7.0
 
 [node name="mermi" parent="." unique_id=1313714118 instance=ExtResource("5_kry3j")]
 position = Vector2(431, 337)
@@ -121,7 +122,7 @@ scale = Vector2(5.99187, 0.7210742)
 
 [node name="tek taraf duvar3" parent="." unique_id=234539641 instance=ExtResource("10_hptm8")]
 position = Vector2(805.00006, 472.00003)
-rotation = 1.4638442
+rotation = 1.5697972
 scale = Vector2(8.391006, 0.66460115)
 
 [node name="StaticBody2D2" parent="." unique_id=729168941 instance=ExtResource("6_ynf5e")]
