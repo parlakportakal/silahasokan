@@ -4,12 +4,10 @@
 [ext_resource type="PackedScene" uid="uid://835xbk7lq8cw" path="res://Scenes/platform.tscn" id="1_bo1nx"]
 [ext_resource type="Texture2D" uid="uid://bh0tjdsqq6gpf" path="res://Assets/civirzivir/arkaplan.png" id="2_6bp64"]
 [ext_resource type="PackedScene" uid="uid://cmtgnb445pe26" path="res://Scenes/player.tscn" id="2_8gbba"]
+[ext_resource type="PackedScene" uid="uid://b48pgm02ythdu" path="res://Scenes/el_banyo.tscn" id="3_6iyac"]
 [ext_resource type="PackedScene" uid="uid://bgld8x6dlgami" path="res://Scenes/pistol.tscn" id="4_jjvhh"]
 [ext_resource type="PackedScene" uid="uid://bgvgdktxhxjjc" path="res://Scenes/pompgun.tscn" id="5_pompgun"]
-[ext_resource type="PackedScene" uid="uid://cm10pumbey81a" path="res://Scenes/duvar.tscn" id="6_ynf5e"]
-[ext_resource type="Texture2D" uid="uid://26whi1h644ba" path="res://Assets/civirzivir/perde.png" id="7_344ge"]
 [ext_resource type="Script" uid="uid://dkffma8252nv3" path="res://Scripts/camera_2d.gd" id="7_jkdf5"]
-[ext_resource type="Texture2D" uid="uid://br5ub5r0t6is5" path="res://Assets/civirzivir/perde2.png" id="8_344ge"]
 [ext_resource type="PackedScene" uid="uid://cnofcfbkhrvum" path="res://Scenes/tek_taraf_duvar.tscn" id="10_hptm8"]
 [ext_resource type="Script" uid="uid://kcsrp7svk77k" path="res://Scripts/silah_ekseni.gd" id="11_silah_ekseni"]
 [ext_resource type="Texture2D" uid="uid://5bo3psmyfyqo" path="res://Assets/cross.png" id="12_fdnlq"]
@@ -23,57 +21,7 @@ position = Vector2(563, 310.00003)
 scale = Vector2(1.6236501, 1.6236501)
 texture = ExtResource("2_6bp64")
 
-[node name="PLATFORMLAR" type="Node" parent="." unique_id=374862151]
-
-[node name="PLATFORM7" parent="PLATFORMLAR" unique_id=1875693618 instance=ExtResource("1_bo1nx")]
-position = Vector2(556, 219.00003)
-rotation = 0.003840969
-scale = Vector2(0.23111154, 0.788217)
-
-[node name="PLATFORM17" parent="PLATFORMLAR" unique_id=1522590111 instance=ExtResource("1_bo1nx")]
-position = Vector2(556, 219.00003)
-rotation = 0.003840969
-scale = Vector2(0.23111154, 0.788217)
-
-[node name="PLATFORM16" parent="PLATFORMLAR" unique_id=45553058 instance=ExtResource("1_bo1nx")]
-position = Vector2(756, 17)
-rotation = 0.003840969
-scale = Vector2(0.23111154, 0.788217)
-
-[node name="PLATFORM8" parent="PLATFORMLAR" unique_id=323929823 instance=ExtResource("1_bo1nx")]
-position = Vector2(758, 232)
-rotation = -0.01156584
-scale = Vector2(0.23111154, 0.788217)
-
-[node name="PLATFORM9" parent="PLATFORMLAR" unique_id=1264084822 instance=ExtResource("1_bo1nx")]
-position = Vector2(756.99994, 339.99997)
-rotation = 0.009819103
-scale = Vector2(0.23111154, 0.788217)
-
-[node name="PLATFORM10" parent="PLATFORMLAR" unique_id=455344758 instance=ExtResource("1_bo1nx")]
-position = Vector2(990.99994, 179.00002)
-rotation = 0.0030467832
-scale = Vector2(0.29727802, 0.70116)
-
-[node name="PLATFORM11" parent="PLATFORMLAR" unique_id=1303109712 instance=ExtResource("1_bo1nx")]
-position = Vector2(991, 13)
-rotation = 0.0013437796
-scale = Vector2(0.31650713, 0.699934)
-
-[node name="PLATFORM12" parent="PLATFORMLAR" unique_id=1938322523 instance=ExtResource("1_bo1nx")]
-position = Vector2(988.99994, 308.00003)
-rotation = -0.00489458
-scale = Vector2(0.30218166, 0.5153067)
-
-[node name="PLATFORM13" parent="PLATFORMLAR" unique_id=691248361 instance=ExtResource("1_bo1nx")]
-position = Vector2(993.99994, 421.00003)
-rotation = -0.00489458
-scale = Vector2(0.2686869, 0.44450063)
-
-[node name="PLATFORM15" parent="PLATFORMLAR" unique_id=857479818 instance=ExtResource("1_bo1nx")]
-position = Vector2(261, 26)
-rotation = 0.0045252843
-scale = Vector2(0.7228227, 0.5129696)
+[node name="EL BANYO" parent="." unique_id=1237655475 instance=ExtResource("3_6iyac")]
 
 [node name="player" parent="." unique_id=1857629448 instance=ExtResource("2_8gbba")]
 position = Vector2(404, 338)
@@ -98,41 +46,37 @@ position_smoothing_enabled = true
 position_smoothing_speed = 7.0
 script = ExtResource("7_jkdf5")
 
-[node name="Perde" type="Sprite2D" parent="." unique_id=1071804381]
-position = Vector2(567, 313.00003)
-scale = Vector2(1.6389999, 1.6389999)
-texture = ExtResource("7_344ge")
-
-[node name="Perde2" type="Sprite2D" parent="Perde" unique_id=394381367]
-position = Vector2(-3.6607666, -1.2202759)
-scale = Vector2(1.029279, 1.029279)
-texture = ExtResource("8_344ge")
-
 [node name="duvarlar" type="Node" parent="." unique_id=418663318]
 
-[node name="StaticBody2D" parent="duvarlar" unique_id=853807131 instance=ExtResource("6_ynf5e")]
-position = Vector2(257, 380)
-rotation = 0.015433997
-scale = Vector2(21.943403, -1.2291486)
+[node name="PLATFORM15" parent="duvarlar" unique_id=857479818 instance=ExtResource("1_bo1nx")]
+position = Vector2(991.00006, 508.00003)
+rotation = -0.003073744
+scale = Vector2(0.8512633, 0.76361585)
+
+[node name="PLATFORM16" parent="duvarlar" unique_id=1875693618 instance=ExtResource("1_bo1nx")]
+position = Vector2(873, 324)
+rotation = -0.007037913
+scale = Vector2(0.48872483, 0.50724506)
+
+[node name="PLATFORM17" parent="duvarlar" unique_id=1706734197 instance=ExtResource("1_bo1nx")]
+position = Vector2(546, 323)
+rotation = -0.007037913
+scale = Vector2(0.34928116, 0.6456629)
+
+[node name="PLATFORM18" parent="duvarlar" unique_id=1842905043 instance=ExtResource("1_bo1nx")]
+position = Vector2(149.99998, 588.00006)
+rotation = 0.022669517
+scale = Vector2(0.25412226, 0.6487352)
+
+[node name="PLATFORM19" parent="duvarlar" unique_id=879636863 instance=ExtResource("1_bo1nx")]
+position = Vector2(22, 456.00003)
+rotation = -0.01568121
+scale = Vector2(0.11471919, 0.6826217)
 
 [node name="tek taraf duvar" parent="duvarlar" unique_id=1153759225 instance=ExtResource("10_hptm8")]
 position = Vector2(1078, 485)
 rotation = 1.5840542
 scale = Vector2(5.99187, 0.7210742)
-
-[node name="tek taraf duvar2" parent="duvarlar" unique_id=1458500552 instance=ExtResource("10_hptm8")]
-position = Vector2(901.00006, 485)
-rotation = -1.5878295
-scale = Vector2(5.99187, 0.7210742)
-
-[node name="tek taraf duvar3" parent="duvarlar" unique_id=234539641 instance=ExtResource("10_hptm8")]
-position = Vector2(805.00006, 472.00003)
-rotation = 1.5697972
-scale = Vector2(8.391006, 0.6646012)
-
-[node name="StaticBody2D2" parent="duvarlar" unique_id=729168941 instance=ExtResource("6_ynf5e")]
-position = Vector2(539, 650.00006)
-scale = Vector2(67.29026, 4.0251107)
 
 [node name="crosshair" type="Sprite2D" parent="." unique_id=1739077503]
 scale = Vector2(0.255, 0.255)

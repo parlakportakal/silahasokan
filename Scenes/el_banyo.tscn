@@ -1,0 +1,9 @@
+[gd_scene format=3 uid="uid://b48pgm02ythdu"]
+
+[ext_resource type="Texture2D" uid="uid://diwtbyw8qbdny" path="res://Assets/civirzivir/Screenshot_198.png" id="1_r7lww"]
+
+[node name="EL BANYO" type="Node2D" unique_id=1237655475]
+
+[node name="Sprite2D" type="Sprite2D" parent="." unique_id=882604163]
+position = Vector2(655, 352)
+texture = ExtResource("1_r7lww")
