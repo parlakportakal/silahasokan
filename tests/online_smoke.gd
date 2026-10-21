@@ -39,7 +39,12 @@ func run_test() -> void:
 		game.local_player.get_node("silaheksen").select_weapon(1)
 		await create_timer(1.0).timeout
 		game.request_fire()
-		await create_timer(1.5).timeout
+		var saw_hit_flash := false
+		var flash_deadline := Time.get_ticks_msec() + 1500
+		while Time.get_ticks_msec() < flash_deadline:
+			await process_frame
+			saw_hit_flash = saw_hit_flash or game.get_node("player/Sprite2D").self_modulate.g < 0.95
+		check(saw_hit_flash, "server-confirmed hit flash appears on client")
 		check(game.get_node("player").position.distance_to(Vector2(404, 300)) < 2.0, "host movement replicated")
 		await create_timer(3.0).timeout
 		check(game.get_node("player").score >= 1, "host score replicated after death")

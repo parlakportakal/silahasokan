@@ -318,17 +318,26 @@ func show_shot(slot: int, pos: Vector2, angle: float, weapon: int) -> void:
 func damage_player(target: Object, shooter: Object, amount: int) -> void:
 	if not playing or not multiplayer.is_server() or target not in [$player, guest] or target == shooter:
 		return
+	var hit_slot := 0 if target == $player else 1
+	if guest_id != 0:
+		show_hit_feedback.rpc(hit_slot)
+	else:
+		show_hit_feedback(hit_slot)
 	target.health = maxi(0, target.health - amount)
 	if target.health == 0:
 		if shooter in [$player, guest]:
 			shooter.score += 1
-		var slot := 0 if target == $player else 1
 		if guest_id != 0:
-			respawn.rpc(slot)
+			respawn.rpc(hit_slot)
 		else:
-			respawn(slot)
+			respawn(hit_slot)
 	if guest_id != 0:
 		sync_health.rpc($player.health, guest.health, $player.score, guest.score)
+
+@rpc("authority", "call_local", "reliable")
+func show_hit_feedback(slot: int) -> void:
+	var player = $player if slot == 0 else guest
+	player.show_hit_feedback()
 
 @rpc("authority", "call_local", "reliable")
 func respawn(slot: int) -> void:

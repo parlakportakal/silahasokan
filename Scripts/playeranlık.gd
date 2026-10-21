@@ -3,6 +3,15 @@ extends CharacterBody2D
 var local_control: bool = false
 var health: int = 100
 var score: int = 0
+var hit_flash: Tween
+
+func show_hit_feedback() -> void:
+	if hit_flash != null and hit_flash.is_valid():
+		hit_flash.kill()
+	# self_modulate sadece karakteri boyar; silah ve oyuncu rengi korunur.
+	$Sprite2D.self_modulate = Color(1.0, 0.15, 0.15)
+	hit_flash = create_tween()
+	hit_flash.tween_property($Sprite2D, "self_modulate", Color.WHITE, 0.18)
 
 var speed = 500
 var jump_force = 400

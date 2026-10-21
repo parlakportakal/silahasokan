@@ -24,6 +24,7 @@ func shoot() -> void:
 		var bullet = bullet_scene.instantiate()
 		bullet.shooter = get_parent().get_parent()
 		bullet.direction = Vector2.RIGHT.rotated(global_rotation + offset_angle)
+		# _ready çalışmadan önce başlangıç konumunu ver; ilk karede sıçramasın.
+		bullet.position = get_tree().current_scene.to_local(muzzle.global_position)
 		get_tree().current_scene.add_child(bullet)
-		bullet.global_position = muzzle.global_position
 		bullet.global_rotation = bullet.direction.angle()
