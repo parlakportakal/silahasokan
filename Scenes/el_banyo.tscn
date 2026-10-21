@@ -1,0 +1,116 @@
+[gd_scene format=3 uid="uid://b48pgm02ythdu"]
+
+[ext_resource type="Texture2D" uid="uid://b6q5irhkttr64" path="res://Assets/civirzivir/Screenshot_198.png" id="1_r7lww"]
+[ext_resource type="PackedScene" uid="uid://835xbk7lq8cw" path="res://Scenes/platform.tscn" id="2_c4016"]
+[ext_resource type="PackedScene" uid="uid://cm10pumbey81a" path="res://Scenes/duvar.tscn" id="3_3t8ro"]
+[ext_resource type="Script" uid="uid://b0rl2noq8ga8i" path="res://Scripts/main.gd" id="4_game"]
+[ext_resource type="PackedScene" uid="uid://cmtgnb445pe26" path="res://Scenes/player.tscn" id="5_player"]
+[ext_resource type="Script" uid="uid://kcsrp7svk77k" path="res://Scripts/silah_ekseni.gd" id="6_axis"]
+[ext_resource type="PackedScene" uid="uid://bgld8x6dlgami" path="res://Scenes/pistol.tscn" id="7_pistol"]
+[ext_resource type="PackedScene" uid="uid://bgvgdktxhxjjc" path="res://Scenes/pompgun.tscn" id="8_pump"]
+[ext_resource type="Script" uid="uid://dkffma8252nv3" path="res://Scripts/camera_2d.gd" id="9_camera"]
+[ext_resource type="Texture2D" uid="uid://5bo3psmyfyqo" path="res://Assets/cross.png" id="10_cross"]
+[ext_resource type="Script" uid="uid://bnnbr4wc7j360" path="res://Scripts/crosshair.gd" id="11_cross_script"]
+
+[node name="EL BANYO" type="Node2D" unique_id=1237655475]
+script = ExtResource("4_game")
+background_path = NodePath("Sprite2D")
+
+[node name="Sprite2D" type="Sprite2D" parent="." unique_id=882604163]
+position = Vector2(655, 352)
+texture = ExtResource("1_r7lww")
+
+[node name="PLATFORMLAR" type="Node2D" parent="." unique_id=1724631943]
+position = Vector2(685, 418)
+
+[node name="PLATFORM15" parent="PLATFORMLAR" unique_id=1875693618 instance=ExtResource("2_c4016")]
+position = Vector2(305, 90.00003)
+rotation = -0.003073744
+scale = Vector2(0.8512633, 0.76361585)
+
+[node name="PLATFORM16" parent="PLATFORMLAR" unique_id=1466195866 instance=ExtResource("2_c4016")]
+position = Vector2(186.99994, -94)
+rotation = -0.007037913
+scale = Vector2(0.48872483, 0.50724506)
+
+[node name="PLATFORM17" parent="PLATFORMLAR" unique_id=930637612 instance=ExtResource("2_c4016")]
+position = Vector2(-140.00006, -95)
+rotation = -0.007037913
+scale = Vector2(0.34928116, 0.6456629)
+
+[node name="PLATFORM25" parent="PLATFORMLAR" unique_id=1216882117 instance=ExtResource("2_c4016")]
+position = Vector2(-148, -194)
+rotation = -0.007037913
+scale = Vector2(0.34928116, 0.6456629)
+
+[node name="PLATFORM20" parent="PLATFORMLAR" unique_id=1181484540 instance=ExtResource("2_c4016")]
+position = Vector2(-151.00006, 16)
+rotation = -0.007037913
+scale = Vector2(0.33185622, 0.94577634)
+
+[node name="PLATFORM22" parent="PLATFORMLAR" unique_id=1671100544 instance=ExtResource("2_c4016")]
+position = Vector2(-412.00003, -290.99997)
+rotation = -0.007037913
+scale = Vector2(0.36662027, 0.8380836)
+
+[node name="PLATFORM23" parent="PLATFORMLAR" unique_id=1140501139 instance=ExtResource("2_c4016")]
+position = Vector2(-148, -386)
+rotation = -0.007037913
+scale = Vector2(0.34804735, 0.85947645)
+
+[node name="PLATFORM24" parent="PLATFORMLAR" unique_id=1824341727 instance=ExtResource("2_c4016")]
+position = Vector2(310, -387.99994)
+rotation = 0.0009273072
+scale = Vector2(0.9194185, 0.5566446)
+
+[node name="PLATFORM21" parent="PLATFORMLAR" unique_id=1690548608 instance=ExtResource("2_c4016")]
+position = Vector2(-354.00003, 123)
+rotation = -0.007037913
+scale = Vector2(0.099184774, 1.9700087)
+
+[node name="PLATFORM18" parent="PLATFORMLAR" unique_id=1472121389 instance=ExtResource("2_c4016")]
+position = Vector2(-536, 170.00009)
+rotation = 0.022669517
+scale = Vector2(0.25412226, 0.6487352)
+
+[node name="PLATFORM19" parent="PLATFORMLAR" unique_id=1348805684 instance=ExtResource("2_c4016")]
+position = Vector2(-664, 38.00003)
+rotation = -0.01568121
+scale = Vector2(0.11471919, 0.6826217)
+
+[node name="StaticBody2D" parent="PLATFORMLAR" unique_id=853807131 instance=ExtResource("3_3t8ro")]
+position = Vector2(-15.0000305, 318)
+scale = Vector2(71.23853, 1.6255584)
+
+[node name="SpawnPoints" type="Node2D" parent="." unique_id=1915079816]
+
+[node name="Host" type="Marker2D" parent="SpawnPoints" unique_id=1659778847]
+position = Vector2(400, 610)
+
+[node name="Guest" type="Marker2D" parent="SpawnPoints" unique_id=1711900316]
+position = Vector2(900, 610)
+
+[node name="player" parent="." unique_id=44292137 instance=ExtResource("5_player")]
+position = Vector2(400, 610)
+
+[node name="silaheksen" type="Node2D" parent="player" unique_id=1887597429]
+script = ExtResource("6_axis")
+
+[node name="pistol" parent="player/silaheksen" unique_id=1897811438 instance=ExtResource("7_pistol")]
+position = Vector2(25, 0)
+
+[node name="pompgun" parent="player/silaheksen" unique_id=863074045 instance=ExtResource("8_pump")]
+visible = false
+position = Vector2(25, 0)
+
+[node name="Camera2D" type="Camera2D" parent="." unique_id=1582325314]
+position = Vector2(655, 352)
+position_smoothing_enabled = true
+position_smoothing_speed = 7.0
+script = ExtResource("9_camera")
+
+[node name="crosshair" type="Sprite2D" parent="." unique_id=1971642014]
+scale = Vector2(0.255, 0.255)
+texture = ExtResource("10_cross")
+offset = Vector2(0, -10.15)
+script = ExtResource("11_cross_script")

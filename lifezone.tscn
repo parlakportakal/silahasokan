@@ -1,0 +1,13 @@
+[gd_scene format=3 uid="uid://by1hleb47pfig"]
+
+[ext_resource type="Script" uid="uid://dq5dv2pfgcbqq" path="res://Scripts/lifezone.gd" id="1_gv0ai"]
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_yf5fn"]
+
+[node name="lifezone" type="Area2D" unique_id=1817054059]
+script = ExtResource("1_gv0ai")
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="." unique_id=2052141635]
+shape = SubResource("RectangleShape2D_yf5fn")
+
+[connection signal="body_exited" from="." to="." method="_on_body_exited"]

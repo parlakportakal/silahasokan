@@ -4,6 +4,7 @@
 [ext_resource type="PackedScene" uid="uid://835xbk7lq8cw" path="res://Scenes/platform.tscn" id="1_bo1nx"]
 [ext_resource type="Texture2D" uid="uid://bh0tjdsqq6gpf" path="res://Assets/civirzivir/arkaplan.png" id="2_6bp64"]
 [ext_resource type="PackedScene" uid="uid://cmtgnb445pe26" path="res://Scenes/player.tscn" id="2_8gbba"]
+[ext_resource type="PackedScene" uid="uid://by1hleb47pfig" path="res://lifezone.tscn" id="2_wsu2k"]
 [ext_resource type="PackedScene" uid="uid://bgld8x6dlgami" path="res://Scenes/pistol.tscn" id="4_jjvhh"]
 [ext_resource type="PackedScene" uid="uid://bgvgdktxhxjjc" path="res://Scenes/pompgun.tscn" id="5_pompgun"]
 [ext_resource type="PackedScene" uid="uid://cm10pumbey81a" path="res://Scenes/duvar.tscn" id="6_ynf5e"]
@@ -17,6 +18,10 @@
 
 [node name="main" type="Node2D" unique_id=2134541721]
 script = ExtResource("1_8gbba")
+
+[node name="lifezone" parent="." unique_id=1817054059 instance=ExtResource("2_wsu2k")]
+position = Vector2(595, 280)
+scale = Vector2(97.18, 97.18)
 
 [node name="Arkaplan" type="Sprite2D" parent="." unique_id=1907234395]
 position = Vector2(563, 310.00003)
@@ -88,12 +93,9 @@ position = Vector2(25, 0)
 visible = false
 position = Vector2(25, 0)
 
-[node name="Camera2D" type="Camera2D" parent="player" unique_id=237960700]
+[node name="Camera2D" type="Camera2D" parent="." unique_id=237960700]
+position = Vector2(563, 310)
 zoom = Vector2(0.815, 0.815)
-limit_left = -37
-limit_top = -65
-limit_right = 1163
-limit_bottom = 685
 position_smoothing_enabled = true
 position_smoothing_speed = 7.0
 script = ExtResource("7_jkdf5")

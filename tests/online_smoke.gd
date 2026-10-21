@@ -16,7 +16,8 @@ func check(value: bool, message: String) -> void:
 		print("PASS " + role + ": " + message)
 
 func run_test() -> void:
-	game = load("res://Scenes/main.tscn").instantiate()
+	var scene_path := "res://Scenes/el_banyo.tscn" if "level2" in OS.get_cmdline_user_args() else "res://Scenes/main.tscn"
+	game = load(scene_path).instantiate()
 	root.add_child(game)
 	current_scene = game
 	if role == "host":

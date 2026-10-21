@@ -1,5 +1,13 @@
 extends Node2D
 
+@export_node_path("Sprite2D") var background_path: NodePath = ^"Arkaplan"
+
+func _spawn_position(slot: int) -> Vector2:
+	var marker := get_node_or_null("SpawnPoints/Host" if slot == 0 else "SpawnPoints/Guest") as Node2D
+	if marker != null:
+		return to_local(marker.global_position)
+	return Vector2(404, 338) if slot == 0 else Vector2(650, 338)
+
 const PORT := 7777
 const STATE_INTERVAL: float = 1.0 / 30.0
 const NetworkMotion = preload("res://Scripts/network_motion.gd")
@@ -29,19 +37,15 @@ func _ready() -> void:
 	# Both peers use identical node paths for RPCs and player references.
 	guest = $player.duplicate()
 	guest.name = "guest"
-	guest.position = Vector2(650, 338)
-	guest.get_node("Camera2D").enabled = false
+	guest.position = _spawn_position(1)
 	add_child(guest)
+	$player.add_to_group("camera_players")
+	guest.add_to_group("camera_players")
 	guest.get_node("Sprite2D").modulate = Color(0.4, 0.75, 1.0)
 	guest.visible = false
 	guest.collision_layer = 0
 	$player.collision_layer = 4
-	camera = $player/Camera2D
-	var bounds: Rect2 = $Arkaplan.get_global_transform() * $Arkaplan.get_rect()
-	camera.limit_left = ceili(bounds.position.x)
-	camera.limit_top = ceili(bounds.position.y)
-	camera.limit_right = floori(bounds.end.x)
-	camera.limit_bottom = floori(bounds.end.y)
+	camera = $Camera2D
 	_fit_camera_to_map()
 	get_viewport().size_changed.connect(_fit_camera_to_map)
 	camera.reset_smoothing()
@@ -53,6 +57,11 @@ func _ready() -> void:
 	multiplayer.server_disconnected.connect(func(): _leave("Odayı kuran oyuncu ayrıldı."))
 	Input.mouse_mode = Input.MOUSE_MODE_VISIBLE
 	$crosshair.hide()
+	var launch_mode: String = get_tree().get_meta("launch_mode", "online")
+	if get_tree().has_meta("launch_mode"):
+		get_tree().remove_meta("launch_mode")
+	if launch_mode == "solo":
+		solo_game()
 
 func _build_ui() -> void:
 	var layer := CanvasLayer.new()
@@ -83,7 +92,7 @@ func _build_ui() -> void:
 	address.placeholder_text = "Odayı kuran kişinin IP adresi"
 	address.text = "127.0.0.1"
 	box.add_child(address)
-	for item in [["Oda kur", host_game], ["IP ile katıl", join_game], ["Tek başına dene", solo_game], ["Bağlantıyı kes / Menü", func(): _leave("Bağlantı kapatıldı.")]]:
+	for item in [["Oda kur", host_game], ["IP ile katıl", join_game], ["Tek başına dene", solo_game], ["Bağlantıyı kes / Menü", func(): _leave("Bağlantı kapatıldı.")], ["Ana menüye dön", return_to_main_menu]]:
 		var button := Button.new()
 		button.text = item[0]
 		button.pressed.connect(item[1])
@@ -92,6 +101,12 @@ func _build_ui() -> void:
 	status.text = "İnternet: UDP 7777 portunu yönlendir veya ortak VPN ağı kullan.\nAynı bilgisayarda test: 127.0.0.1\nHareket: A/D • Zıpla: Space • Silah: 1/2 • Ateş: Sol tık\nEsc: Menü / Oyuna dön"
 	status.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 	box.add_child(status)
+
+func return_to_main_menu() -> void:
+	_leave("")
+	var error := get_tree().change_scene_to_file("res://Scenes/main_menu.tscn")
+	if error != OK:
+		status.text = "Ana menü açılamadı: " + error_string(error)
 
 func host_game() -> void:
 	_leave("")
@@ -133,10 +148,10 @@ func _start(player: CharacterBody2D) -> void:
 	local_player = player
 	$player.local_control = player == $player
 	guest.local_control = player == guest
-	camera.reparent(local_player, false)
-	camera.position = Vector2.ZERO
+	_fit_camera_to_map()
 	camera.enabled = true
 	camera.make_current()
+	camera.begin_match()
 	camera.reset_smoothing()
 	menu.hide()
 	$crosshair.show()
@@ -157,7 +172,7 @@ func client_ready() -> void:
 	_reset_remote_motion()
 	guest.visible = true
 	guest.collision_layer = 4
-	guest.position = Vector2(650, 338)
+	guest.position = _spawn_position(1)
 	guest.health = 100
 	guest.score = 0
 	setup_guest.rpc_id(guest_id, guest_id)
@@ -181,6 +196,7 @@ func _peer_disconnected(id: int) -> void:
 		session_note = "Arkadaşın ayrıldı • Yeniden katılabilir"
 
 func _leave(message: String) -> void:
+	camera.end_match()
 	predicted_shots.clear()
 	shot_sequence = 0
 	_reset_remote_motion()
@@ -198,8 +214,8 @@ func _leave(message: String) -> void:
 		player.health = 100
 		player.score = 0
 		player.get_node("silaheksen").select_weapon(0)
-	$player.position = Vector2(404, 338)
-	guest.position = Vector2(650, 338)
+	$player.position = _spawn_position(0)
+	guest.position = _spawn_position(1)
 	for child in get_children():
 		if child is Area2D:
 			child.queue_free()
@@ -379,7 +395,7 @@ func show_hit_feedback(slot: int) -> void:
 func respawn(slot: int) -> void:
 	_reset_remote_motion()
 	var player = $player if slot == 0 else guest
-	player.position = Vector2(404, 338) if slot == 0 else Vector2(650, 338)
+	player.position = _spawn_position(slot)
 	player.velocity = Vector2.ZERO
 	player.health = 100
 	player.jump_count = 0
@@ -393,10 +409,9 @@ func sync_health(host_health: int, guest_health: int, host_score: int, guest_sco
 	guest.score = guest_score
 
 func _fit_camera_to_map() -> void:
-	var map_size := Vector2(camera.limit_right - camera.limit_left, camera.limit_bottom - camera.limit_top)
-	var viewport_size := get_viewport_rect().size
-	var zoom_level := maxf(2.96, maxf(viewport_size.x / map_size.x, viewport_size.y / map_size.y))
-	camera.zoom = Vector2.ONE * zoom_level
+	var background := get_node(background_path) as Sprite2D
+	var bounds: Rect2 = background.get_global_transform() * background.get_rect()
+	camera.configure_map(bounds)
 
 func _input(event: InputEvent) -> void:
 	if event is InputEventKey and event.pressed and not event.echo and event.keycode == KEY_ESCAPE and playing:

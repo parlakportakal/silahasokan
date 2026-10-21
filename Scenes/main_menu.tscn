@@ -1,0 +1,161 @@
+[gd_scene format=3 uid="uid://cu7f4rsjtbjt0"]
+
+[ext_resource type="Script" uid="uid://cgnpj12ps1q8w" path="res://Scripts/main_menu.gd" id="1_menu"]
+
+[sub_resource type="StyleBoxFlat" id="Style_focus"]
+bg_color = Color(0, 0, 0, 0)
+border_width_left = 2
+border_width_top = 2
+border_width_right = 2
+border_width_bottom = 2
+border_color = Color(1, 0.64, 0.3, 1)
+corner_radius_top_left = 8
+corner_radius_top_right = 8
+corner_radius_bottom_right = 8
+corner_radius_bottom_left = 8
+
+[sub_resource type="StyleBoxFlat" id="Style_hover"]
+bg_color = Color(0.23, 0.31, 0.41, 1)
+corner_radius_top_left = 8
+corner_radius_top_right = 8
+corner_radius_bottom_right = 8
+corner_radius_bottom_left = 8
+
+[sub_resource type="StyleBoxFlat" id="Style_normal"]
+bg_color = Color(0.13, 0.18, 0.25, 1)
+corner_radius_top_left = 8
+corner_radius_top_right = 8
+corner_radius_bottom_right = 8
+corner_radius_bottom_left = 8
+
+[sub_resource type="Theme" id="Theme_menu"]
+default_font_size = 22
+Button/styles/focus = SubResource("Style_focus")
+Button/styles/hover = SubResource("Style_hover")
+Button/styles/normal = SubResource("Style_normal")
+Button/styles/pressed = SubResource("Style_hover")
+
+[node name="MainMenu" type="Control" unique_id=1585145351]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+theme = SubResource("Theme_menu")
+script = ExtResource("1_menu")
+
+[node name="Background" type="ColorRect" parent="." unique_id=830629514]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+color = Color(0.035, 0.055, 0.085, 1)
+
+[node name="Center" type="CenterContainer" parent="." unique_id=1530816387]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = -456.0
+offset_top = -78.0
+offset_right = -456.0
+offset_bottom = -78.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="Content" type="VBoxContainer" parent="Center" unique_id=1932755208]
+custom_minimum_size = Vector2(460, 0)
+layout_mode = 2
+theme_override_constants/separation = 16
+
+[node name="Eyebrow" type="Label" parent="Center/Content" unique_id=678101577]
+visible = false
+layout_mode = 2
+theme_override_colors/font_color = Color(1, 0.64, 0.3, 1)
+theme_override_font_sizes/font_size = 18
+text = "ANA MENÜ"
+horizontal_alignment = 1
+
+[node name="Title" type="Label" parent="Center/Content" unique_id=738381076]
+visible = false
+layout_mode = 2
+theme_override_font_sizes/font_size = 44
+text = "HAMBONING"
+horizontal_alignment = 1
+
+[node name="Spacer" type="Control" parent="Center/Content" unique_id=1374002667]
+custom_minimum_size = Vector2(0, 16)
+layout_mode = 2
+mouse_filter = 2
+
+[node name="OnlineButton" type="Button" parent="Center/Content" unique_id=1034545755]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(0, 58)
+layout_mode = 2
+text = "Oyna"
+
+[node name="SoloButton" type="Button" parent="Center/Content" unique_id=1818132882]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(0, 58)
+layout_mode = 2
+text = "Tek başına dene"
+
+[node name="QuitButton" type="Button" parent="Center/Content" unique_id=1945198987]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(0, 58)
+layout_mode = 2
+text = "Çıkış"
+
+[node name="MapSelection" type="VBoxContainer" parent="Center/Content"]
+unique_name_in_owner = true
+visible = false
+layout_mode = 2
+theme_override_constants/separation = 16
+
+[node name="MapTitle" type="Label" parent="Center/Content/MapSelection"]
+layout_mode = 2
+text = "HARİTA SEÇ"
+horizontal_alignment = 1
+
+[node name="Level1Button" type="Button" parent="Center/Content/MapSelection"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(0, 58)
+layout_mode = 2
+text = "Level 1"
+
+[node name="Level2Button" type="Button" parent="Center/Content/MapSelection"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(0, 58)
+layout_mode = 2
+text = "Level 2 — El Banyo"
+
+[node name="MapHint" type="Label" parent="Center/Content/MapSelection"]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_font_sizes/font_size = 16
+text = "Online oynarken ikiniz de aynı haritayı seçin."
+horizontal_alignment = 1
+autowrap_mode = 3
+
+[node name="BackButton" type="Button" parent="Center/Content/MapSelection"]
+custom_minimum_size = Vector2(0, 58)
+layout_mode = 2
+text = "Geri"
+
+[node name="Status" type="Label" parent="Center/Content" unique_id=226304510]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_font_sizes/font_size = 16
+horizontal_alignment = 1
+autowrap_mode = 3
+
+[connection signal="pressed" from="Center/Content/OnlineButton" to="." method="_on_online_pressed"]
+[connection signal="pressed" from="Center/Content/SoloButton" to="." method="_on_solo_pressed"]
+[connection signal="pressed" from="Center/Content/QuitButton" to="." method="_on_quit_pressed"]
+[connection signal="pressed" from="Center/Content/MapSelection/Level1Button" to="." method="_on_level_1_pressed"]
+[connection signal="pressed" from="Center/Content/MapSelection/Level2Button" to="." method="_on_level_2_pressed"]
+[connection signal="pressed" from="Center/Content/MapSelection/BackButton" to="." method="_on_back_pressed"]
