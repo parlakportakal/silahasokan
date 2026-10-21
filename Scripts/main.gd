@@ -1,6 +1,10 @@
 extends Node2D
 
 const PORT := 7777
+const STATE_INTERVAL: float = 1.0 / 30.0
+const NetworkMotion = preload("res://Scripts/network_motion.gd")
+var remote_motion := NetworkMotion.new()
+var sprite_origin := Vector2.ZERO
 var guest_id: int = 0
 var playing := false
 var connecting := false
@@ -17,6 +21,9 @@ var session_note := ""
 var health_label: Label
 
 func _ready() -> void:
+	# Hareketi oyuncunun fizik adımından sonra, sabit aralıklarla gönder.
+	process_physics_priority = 100
+	sprite_origin = $player/Sprite2D.position
 	# Both peers use identical node paths for RPCs and player references.
 	guest = $player.duplicate()
 	guest.name = "guest"
@@ -117,6 +124,8 @@ func solo_game() -> void:
 	session_note = "Tek oyuncu"
 
 func _start(player: CharacterBody2D) -> void:
+	_reset_remote_motion()
+	send_time = 0.0
 	playing = true
 	connecting = false
 	local_player = player
@@ -143,6 +152,7 @@ func client_ready() -> void:
 	if not multiplayer.is_server() or guest_id != 0:
 		return
 	guest_id = multiplayer.get_remote_sender_id()
+	_reset_remote_motion()
 	guest.visible = true
 	guest.collision_layer = 4
 	guest.position = Vector2(650, 338)
@@ -162,12 +172,14 @@ func setup_guest(id: int) -> void:
 
 func _peer_disconnected(id: int) -> void:
 	if multiplayer.is_server() and id == guest_id:
+		_reset_remote_motion()
 		guest_id = 0
 		guest.hide()
 		guest.collision_layer = 0
 		session_note = "Arkadaşın ayrıldı • Yeniden katılabilir"
 
 func _leave(message: String) -> void:
+	_reset_remote_motion()
 	playing = false
 	connecting = false
 	$player.local_control = false
@@ -200,11 +212,17 @@ func _process(delta: float) -> void:
 			_leave("Bağlantı zaman aşımına uğradı. IP / UDP 7777 / VPN ayarını kontrol et.")
 	if not playing:
 		return
+	_render_remote_player()
 	hud.text = "%s\nCan: %d • Skor: %d - %d • 1: Pistol / 2: Pompalı • Esc: Menü" % [session_note, local_player.health, $player.score, guest.score]
-	send_time += delta
-	if send_time < 0.033:
+
+func _physics_process(delta: float) -> void:
+	if not playing:
 		return
-	send_time = 0.0
+	send_time += delta
+	if send_time < STATE_INTERVAL:
+		return
+	# Kalan süreyi koru; FPS değişince ağ güncelleme hızı değişmesin.
+	send_time = fmod(send_time, STATE_INTERVAL)
 	var axis = local_player.get_node("silaheksen")
 	if multiplayer.is_server():
 		if guest_id != 0:
@@ -217,9 +235,29 @@ func _apply_state(player: CharacterBody2D, pos: Vector2, vel: Vector2, angle: fl
 		return
 	player.position = pos
 	player.velocity = vel
-	player.get_node("silaheksen").rotation = angle
+	remote_motion.push(Time.get_ticks_usec() / 1000000.0, pos, angle)
 	player.get_node("silaheksen").select_weapon(weapon)
 	player.get_node("Sprite2D").flip_h = flip
+	_render_remote_player()
+
+func _render_remote_player() -> void:
+	if not playing or guest_id == 0:
+		return
+	var state: Dictionary = remote_motion.sample(Time.get_ticks_usec() / 1000000.0)
+	if state.is_empty():
+		return
+	var remote_player = guest if multiplayer.is_server() else $player
+	# Çarpışma gövdesi son gerçek konumda kalır; yalnızca görüntüyü yumuşat.
+	var visual_offset: Vector2 = state.position - remote_player.position
+	remote_player.get_node("Sprite2D").position = sprite_origin + visual_offset
+	remote_player.get_node("silaheksen").position = visual_offset
+	remote_player.get_node("silaheksen").rotation = state.angle
+
+func _reset_remote_motion() -> void:
+	remote_motion.clear()
+	for player in [$player, guest]:
+		player.get_node("Sprite2D").position = sprite_origin
+		player.get_node("silaheksen").position = Vector2.ZERO
 
 @rpc("any_peer", "call_remote", "unreliable_ordered", 1)
 func client_state(pos: Vector2, vel: Vector2, angle: float, weapon: int, flip: bool) -> void:
@@ -264,13 +302,17 @@ func show_shot(slot: int, pos: Vector2, angle: float, weapon: int) -> void:
 	var old_position: Vector2 = player.position
 	var old_angle: float = axis.rotation
 	var old_weapon: int = axis.selected_weapon
+	var old_axis_position: Vector2 = axis.position
 	player.position = pos
+	# Yumuşatılmış görüntü ofseti, sunucudaki gerçek namlu konumunu değiştirmesin.
+	axis.position = Vector2.ZERO
 	axis.rotation = angle
 	axis.select_weapon(weapon)
 	axis.weapons[weapon].shoot()
 	player.position = old_position
+	axis.position = old_axis_position
+	axis.rotation = old_angle
 	if player == local_player:
-		axis.rotation = old_angle
 		axis.select_weapon(old_weapon)
 
 func damage_player(target: Object, shooter: Object, amount: int) -> void:
@@ -290,6 +332,7 @@ func damage_player(target: Object, shooter: Object, amount: int) -> void:
 
 @rpc("authority", "call_local", "reliable")
 func respawn(slot: int) -> void:
+	_reset_remote_motion()
 	var player = $player if slot == 0 else guest
 	player.position = Vector2(404, 338) if slot == 0 else Vector2(650, 338)
 	player.velocity = Vector2.ZERO
