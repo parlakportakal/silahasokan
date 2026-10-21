@@ -19,6 +19,8 @@ var status: Label
 var hud: Label
 var session_note := ""
 var health_label: Label
+var shot_sequence: int = 0
+var predicted_shots: Dictionary = {}
 
 func _ready() -> void:
 	# Hareketi oyuncunun fizik adımından sonra, sabit aralıklarla gönder.
@@ -179,6 +181,8 @@ func _peer_disconnected(id: int) -> void:
 		session_note = "Arkadaşın ayrıldı • Yeniden katılabilir"
 
 func _leave(message: String) -> void:
+	predicted_shots.clear()
+	shot_sequence = 0
 	_reset_remote_motion()
 	playing = false
 	connecting = false
@@ -206,6 +210,14 @@ func _leave(message: String) -> void:
 	Input.mouse_mode = Input.MOUSE_MODE_VISIBLE
 
 func _process(delta: float) -> void:
+	# Yanıt gelmese bile ömrü dolan görsel mermileri listede tutma.
+	for shot_id in predicted_shots.keys():
+		var alive := false
+		for bullet in predicted_shots[shot_id]:
+			if is_instance_valid(bullet):
+				alive = true
+		if not alive:
+			predicted_shots.erase(shot_id)
 	if connecting:
 		connect_time += delta
 		if connect_time > 12.0:
@@ -275,27 +287,51 @@ func request_fire() -> void:
 	if multiplayer.is_server():
 		_server_fire(0, axis.rotation, axis.selected_weapon)
 	else:
-		fire_request.rpc_id(1, axis.rotation, axis.selected_weapon)
+		var weapon = axis.weapons[axis.selected_weapon]
+		if weapon.cooldown > 0.0:
+			return
+		shot_sequence += 1
+		# Görseli hemen başlat; hasarı hâlâ yalnızca sunucu hesaplar.
+		predicted_shots[shot_sequence] = weapon.shoot()
+		fire_request.rpc_id(1, axis.rotation, axis.selected_weapon, shot_sequence, local_player.position)
 
 @rpc("any_peer", "call_remote", "reliable")
-func fire_request(angle: float, weapon: int) -> void:
+func fire_request(angle: float, weapon: int, shot_id: int, origin: Vector2) -> void:
 	if multiplayer.is_server() and multiplayer.get_remote_sender_id() == guest_id:
-		_server_fire(1, angle, weapon)
+		if shot_id <= 0 or not origin.is_finite():
+			return
+		_server_fire(1, angle, weapon, shot_id, origin)
 
-func _server_fire(slot: int, angle: float, weapon: int) -> void:
+func _server_fire(slot: int, angle: float, weapon: int, shot_id: int = 0, origin: Vector2 = Vector2.INF) -> void:
 	if not is_finite(angle) or weapon < 0 or weapon > 1:
+		if slot == 1:
+			reject_shot.rpc_id(guest_id, shot_id)
 		return
 	var player = $player if slot == 0 else guest
 	var axis = player.get_node("silaheksen")
 	if axis.weapons[weapon].cooldown > 0.0:
+		if slot == 1:
+			reject_shot.rpc_id(guest_id, shot_id)
 		return
+	var shot_origin: Vector2 = player.position if slot == 0 else origin
 	if guest_id != 0:
-		show_shot.rpc(slot, player.position, angle, weapon)
+		show_shot.rpc(slot, shot_origin, angle, weapon, shot_id)
 	else:
 		show_shot(slot, player.position, angle, weapon)
 
+@rpc("authority", "call_remote", "reliable")
+func reject_shot(shot_id: int) -> void:
+	for bullet in predicted_shots.get(shot_id, []):
+		if is_instance_valid(bullet):
+			bullet.queue_free()
+	predicted_shots.erase(shot_id)
+
 @rpc("authority", "call_local", "reliable")
-func show_shot(slot: int, pos: Vector2, angle: float, weapon: int) -> void:
+func show_shot(slot: int, pos: Vector2, angle: float, weapon: int, shot_id: int = 0) -> void:
+	if not multiplayer.is_server() and slot == 1 and shot_id > 0:
+		# Onay gecikse veya görsel çoktan silinse de aynı atışı tekrar oluşturma.
+		predicted_shots.erase(shot_id)
+		return
 	var player = $player if slot == 0 else guest
 	var axis = player.get_node("silaheksen")
 	# Use the host's shot origin even when a movement packet arrives later.

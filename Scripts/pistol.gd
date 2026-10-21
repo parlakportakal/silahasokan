@@ -14,7 +14,8 @@ func _process(delta: float) -> void:
 	cooldown = maxf(0.0, cooldown - delta)
 
 
-func shoot() -> void:
+func shoot() -> Array[Node2D]:
+	var bullets: Array[Node2D] = []
 	scale.y = -1.0 if cos(global_rotation) < 0.0 else 1.0
 	cooldown = fire_interval
 	for index in range(pellet_count):
@@ -28,3 +29,5 @@ func shoot() -> void:
 		bullet.position = get_tree().current_scene.to_local(muzzle.global_position)
 		get_tree().current_scene.add_child(bullet)
 		bullet.global_rotation = bullet.direction.angle()
+		bullets.append(bullet)
+	return bullets

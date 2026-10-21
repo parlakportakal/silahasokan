@@ -38,12 +38,26 @@ func run_test() -> void:
 		game.local_player.get_node("silaheksen").rotation = PI
 		game.local_player.get_node("silaheksen").select_weapon(1)
 		await create_timer(1.0).timeout
+		var spawned := {"count": 0}
+		game.child_entered_tree.connect(func(node):
+			if node is Area2D and node.shooter == game.guest:
+				spawned.count += 1
+		)
+		multiplayer_poll = false
 		game.request_fire()
+		check(spawned.count == 6, "client pellets appear immediately without a server response")
+		game.request_fire()
+		check(spawned.count == 6, "local cooldown blocks repeat prediction")
+		await create_timer(0.4).timeout
+		check(spawned.count == 6, "400ms withheld network response does not delay or repeat the shot")
+		multiplayer_poll = true
 		var saw_hit_flash := false
-		var flash_deadline := Time.get_ticks_msec() + 1500
+		var flash_deadline := Time.get_ticks_msec() + 1100
 		while Time.get_ticks_msec() < flash_deadline:
 			await process_frame
 			saw_hit_flash = saw_hit_flash or game.get_node("player/Sprite2D").self_modulate.g < 0.95
+		check(spawned.count == 6, "late server confirmation does not spawn duplicate pellets")
+		check(game.predicted_shots.is_empty(), "confirmed shots are removed from pending predictions")
 		check(saw_hit_flash, "server-confirmed hit flash appears on client")
 		check(game.get_node("player").position.distance_to(Vector2(404, 300)) < 2.0, "host movement replicated")
 		await create_timer(3.0).timeout
