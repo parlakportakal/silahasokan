@@ -1,0 +1,51 @@
+SILAHA SOKAN - IKI KISILIK ONLINE PROTOTIP
+
+1. ZIP dosyasini tamamen bir klasore cikarin.
+2. SilahaSokan.exe ve SilahaSokan.pck ayni klasorde kalmali.
+3. Iki oyuncu da ayni oyun paketini kullanmali. Godot kurmak gerekmez.
+
+FARKLI EVLERDEN OYNAMAK - VPN YONTEMI
+Iki bilgisayara Tailscale kurun ve kendi hesaplarinizla giris yapin.
+Odayi kuracak kisi, Tailscale yonetim ekraninda kendi bilgisayarini
+arkadasinin hesabiyla paylassin. Arkadasi paylasim davetini kabul etsin.
+Odayi kuran kisi oyunda 'Oda kur' desin.
+Diger kisi, paylasilan bilgisayarin Tailscale IP adresini oyuna yazip
+'IP ile katil' desin. Sadece IP yazin; sonuna :7777 eklemeyin.
+Windows guvenlik duvari sorarsa oyuna kullandiginiz agda izin verin.
+Tailscale baglantisi iki bilgisayarda da acik kalmali.
+Resmi rehberler:
+https://tailscale.com/docs/how-to/connect-to-devices
+https://tailscale.com/docs/use-cases/personal-or-at-home-use/share-private-game-server
+
+VPN OLMADAN INTERNET
+Odayi kuran bilgisayara modemden UDP 7777 portu yonlendirilmelidir.
+Arkadasiniz oyuna sizin genel (public) IP adresinizi girer.
+CGNAT varsa port yonlendirme tek basina yeterli olmayabilir; VPN yolunu kullanin.
+Otomatik oda kodu, eslestirme veya araci sunucu bu prototipte yok.
+
+AYNI WIFI / YEREL AG
+Odayi kuran bilgisayarin yerel IPv4 adresini kullanin (orn. 192.168.1.20).
+127.0.0.1 yalnizca ayni bilgisayarda iki oyun penceresiyle test icindir.
+
+KONTROLLER
+A / D: Hareket
+Space: Zipla
+S: Tek yonlu platformdan asagi in
+1: Pistol
+2: Pompali
+Sol tik: Ates
+Esc: Menu / Oyuna don
+Menu oyunu diger oyuncu icin durdurmaz.
+
+OYUN
+Her oyuncu 100 canla baslar. Mermi basina 10 hasar.
+Pistol tek mermi, pompali 6 sacma atar.
+Olunce yeniden dogarsiniz; rakibinizin skoru artar.
+Odayi kuran oyundan cikarsa oturum biter.
+Hareket oyuncunun bilgisayarinda hesaplanir; atis hizi, hasar ve skor sunucudadir.
+Bu, arkadaslar arasinda test icin prototiptir; rekabetci hile korumasi yoktur.
+
+TEST DURUMU
+Iki ayri oyun sureciyle yerel baglanti, hareket, nisan, silah secimi,
+iki yonlu ates/hasar, skor, yeniden dogma ve ayrilma testleri gecti.
+Farkli internet aglarindan gercek baglanti henuz denenmedi.

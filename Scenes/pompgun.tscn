@@ -1,0 +1,17 @@
+[gd_scene format=3 uid="uid://bgvgdktxhxjjc"]
+
+[ext_resource type="Texture2D" uid="uid://cbht6xt2hj5j2" path="res://Assets/silahlar/shotgun2.png" id="1_iil66"]
+[ext_resource type="Script" path="res://Scripts/pistol.gd" id="2_weapon"]
+
+[node name="pompgun" type="Node2D" unique_id=953302788]
+script = ExtResource("2_weapon")
+pellet_count = 6
+spread_degrees = 16.0
+fire_interval = 0.65
+
+[node name="Sprite2D" type="Sprite2D" parent="." unique_id=44393948]
+scale = Vector2(0.08, 0.08)
+texture = ExtResource("1_iil66")
+
+[node name="muzzle" type="Marker2D" parent="." unique_id=1509712896]
+position = Vector2(27, -6)

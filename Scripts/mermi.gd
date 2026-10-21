@@ -1,27 +1,30 @@
 extends Area2D
 
+var direction := Vector2.RIGHT
 @export var speed: float = 900.0
-@export var damage: float = 5.0
-@export var knockback: float = 250.0
-@export var lifetime: float = 2.0
-## Knockback yönünü yukarı eğer, oyuncuyu havaya kaldırır
-@export var launch_angle_degrees: float = 15.0
+@export var bullet_gravity: float = 980.0
+var damage := 10
+var lifetime := 2.0
+var velocity := Vector2.ZERO
+var shooter: CollisionObject2D
 
-var direction: Vector2 = Vector2.RIGHT
-var shooter: Node = null
-
-func _ready() -> void:
-	body_entered.connect(_on_body_entered)
-	get_tree().create_timer(lifetime).timeout.connect(queue_free)
-
-func _physics_process(delta: float) -> void:
-	position += direction * speed * delta
-
-func _on_body_entered(body: Node) -> void:
-	if body == shooter:
+func _physics_process(delta):
+	velocity.y += bullet_gravity * delta
+	var next_position: Vector2 = global_position + velocity * delta
+	var query := PhysicsRayQueryParameters2D.create(global_position, next_position, 7)
+	if is_instance_valid(shooter):
+		query.exclude = [shooter.get_rid()]
+	var hit := get_world_2d().direct_space_state.intersect_ray(query)
+	if not hit.is_empty():
+		if multiplayer.is_server() and get_tree().current_scene.has_method("damage_player"):
+			get_tree().current_scene.damage_player(hit.collider, shooter, damage)
+		queue_free()
 		return
-	if body.has_method("apply_hit"):
-		# Sağa giden mermide -açı, sola gidende +açı = hep yukarı eğilir
-		var hit_dir := direction.rotated(-deg_to_rad(launch_angle_degrees) * signf(direction.x))
-		body.apply_hit(damage, knockback, hit_dir)
-	queue_free()  # oyuncuya veya duvara çarpınca yok ol
+	global_position = next_position
+	global_rotation = velocity.angle()
+
+func _ready():
+	velocity = direction.normalized() * speed
+	global_rotation = velocity.angle()
+	await get_tree().create_timer(lifetime).timeout
+	queue_free()

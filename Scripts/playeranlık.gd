@@ -1,5 +1,9 @@
 extends CharacterBody2D
 
+var local_control: bool = false
+var health: int = 100
+var score: int = 0
+
 var speed = 500
 var jump_force = 400
 var gravity = 980
@@ -16,6 +20,8 @@ var last_wall_jump_side = 0
 
 
 func _physics_process(delta: float) -> void:
+	if not local_control:
+		return
 	var direction = Vector2.ZERO
 
 	var sag_duvar = $raycastsag.is_colliding()

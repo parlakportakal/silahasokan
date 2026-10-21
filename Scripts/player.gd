@@ -27,10 +27,12 @@ extends CharacterBody2D
 @export var reset_even_when_holding: bool = false
 
 var coyote_timer: float = 0.0       # Kenardan düştükten sonra kalan "bonus" süre
+#region New Code Region
 var jump_buffer_timer: float = 0.0  # Zıplama tuşuna basıldıktan sonra kalan süre
 var jumps_left: int = 0             # Kalan zıplama hakkı
 var can_cut_jump: bool = false      # Bu zıplama tuş bırakılınca kısalabilir mi?
 #endregion
+
 
 func _physics_process(delta: float) -> void:
 	var was_on_floor := is_on_floor() 
