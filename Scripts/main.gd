@@ -26,7 +26,6 @@ var address: LineEdit
 var status: Label
 var hud: Label
 var session_note := ""
-var health_label: Label
 var shot_sequence: int = 0
 var predicted_shots: Dictionary = {}
 
@@ -173,10 +172,12 @@ func client_ready() -> void:
 	guest.visible = true
 	guest.collision_layer = 4
 	guest.position = _spawn_position(1)
-	guest.health = 100
+	guest.spawn_generation = 0
+	guest.lives = guest.starting_lives
+	guest.reset_combat()
 	guest.score = 0
 	setup_guest.rpc_id(guest_id, guest_id)
-	sync_health.rpc($player.health, guest.health, $player.score, guest.score)
+	sync_combat.rpc($player.damage_percent, guest.damage_percent, $player.lives, guest.lives, $player.score, guest.score)
 	session_note = "Arkadaşın bağlandı • 2/2 oyuncu"
 
 @rpc("authority", "call_remote", "reliable")
@@ -211,13 +212,15 @@ func _leave(message: String) -> void:
 	guest.collision_layer = 0
 	for player in [$player, guest]:
 		player.velocity = Vector2.ZERO
-		player.health = 100
+		player.spawn_generation = 0
+		player.lives = player.starting_lives
+		player.reset_combat()
 		player.score = 0
 		player.get_node("silaheksen").select_weapon(0)
 	$player.position = _spawn_position(0)
 	guest.position = _spawn_position(1)
 	for child in get_children():
-		if child is Area2D:
+		if child is Area2D and child.get_script() == preload("res://Scripts/mermi.gd"):
 			child.queue_free()
 	menu.show()
 	status.text = message
@@ -241,9 +244,16 @@ func _process(delta: float) -> void:
 	if not playing:
 		return
 	_render_remote_player()
-	hud.text = "%s\nCan: %d • Skor: %d - %d • 1: Pistol / 2: Pompalı • Esc: Menü" % [session_note, local_player.health, $player.score, guest.score]
+	hud.text = "%s\nCan: %d • Hasar: %.0f%% • Knockback: x%.2f\nSkor: %d - %d • 1: Pistol / 2: Pompalı • Esc: Menü" % [session_note, local_player.lives, local_player.damage_percent, local_player.knockback_multiplier, $player.score, guest.score]
 
 func _physics_process(delta: float) -> void:
+	if not playing:
+		return
+	if multiplayer.is_server():
+		for fighter in [$player, guest]:
+			var zone := get_node_or_null("lifezone")
+			if zone != null and fighter.visible and fighter.lives > 0 and fighter.respawn_grace <= 0.0 and not zone.contains_point(fighter.global_position):
+				player_left_lifezone(fighter)
 	if not playing:
 		return
 	send_time += delta
@@ -254,9 +264,9 @@ func _physics_process(delta: float) -> void:
 	var axis = local_player.get_node("silaheksen")
 	if multiplayer.is_server():
 		if guest_id != 0:
-			host_state.rpc(local_player.position, local_player.velocity, axis.rotation, axis.selected_weapon, local_player.get_node("Sprite2D").flip_h)
+			host_state.rpc(local_player.position, local_player.velocity, axis.rotation, axis.selected_weapon, local_player.get_node("Sprite2D").flip_h, local_player.spawn_generation)
 	else:
-		client_state.rpc_id(1, local_player.position, local_player.velocity, axis.rotation, axis.selected_weapon, local_player.get_node("Sprite2D").flip_h)
+		client_state.rpc_id(1, local_player.position, local_player.velocity, axis.rotation, axis.selected_weapon, local_player.get_node("Sprite2D").flip_h, local_player.spawn_generation)
 
 func _apply_state(player: CharacterBody2D, pos: Vector2, vel: Vector2, angle: float, weapon: int, flip: bool) -> void:
 	if not pos.is_finite() or not vel.is_finite() or not is_finite(angle) or weapon < 0 or weapon > 1:
@@ -288,13 +298,14 @@ func _reset_remote_motion() -> void:
 		player.get_node("silaheksen").position = Vector2.ZERO
 
 @rpc("any_peer", "call_remote", "unreliable_ordered", 1)
-func client_state(pos: Vector2, vel: Vector2, angle: float, weapon: int, flip: bool) -> void:
-	if multiplayer.is_server() and multiplayer.get_remote_sender_id() == guest_id:
+func client_state(pos: Vector2, vel: Vector2, angle: float, weapon: int, flip: bool, generation: int = 0) -> void:
+	if multiplayer.is_server() and multiplayer.get_remote_sender_id() == guest_id and generation == guest.spawn_generation:
 		_apply_state(guest, pos, vel, angle, weapon, flip)
 
 @rpc("authority", "call_remote", "unreliable_ordered", 1)
-func host_state(pos: Vector2, vel: Vector2, angle: float, weapon: int, flip: bool) -> void:
-	_apply_state($player, pos, vel, angle, weapon, flip)
+func host_state(pos: Vector2, vel: Vector2, angle: float, weapon: int, flip: bool, generation: int = 0) -> void:
+	if generation == $player.spawn_generation:
+		_apply_state($player, pos, vel, angle, weapon, flip)
 
 func request_fire() -> void:
 	if not playing or menu.visible:
@@ -367,44 +378,73 @@ func show_shot(slot: int, pos: Vector2, angle: float, weapon: int, shot_id: int 
 	if player == local_player:
 		axis.select_weapon(old_weapon)
 
-func damage_player(target: Object, shooter: Object, amount: int) -> void:
+func damage_player(target: Object, shooter: Object, amount: int, hit_direction: Vector2 = Vector2.RIGHT) -> void:
 	if not playing or not multiplayer.is_server() or target not in [$player, guest] or target == shooter:
 		return
-	var hit_slot := 0 if target == $player else 1
+	if target.lives <= 0 or target.respawn_grace > 0.0:
+		return
+	var slot := 0 if target == $player else 1
+	var percent: float = target.damage_percent + maxf(amount, 0)
+	var impulse := hit_direction.normalized() * (260.0 + amount * 6.0) * (1.0 + percent / 100.0)
+	impulse.y -= 100.0
+	var attacker := 0 if shooter == $player else 1
 	if guest_id != 0:
-		show_hit_feedback.rpc(hit_slot)
+		apply_hit.rpc(slot, percent, impulse, attacker)
 	else:
-		show_hit_feedback(hit_slot)
-	target.health = maxi(0, target.health - amount)
-	if target.health == 0:
-		if shooter in [$player, guest]:
-			shooter.score += 1
-		if guest_id != 0:
-			respawn.rpc(hit_slot)
-		else:
-			respawn(hit_slot)
-	if guest_id != 0:
-		sync_health.rpc($player.health, guest.health, $player.score, guest.score)
+		apply_hit(slot, percent, impulse, attacker)
 
 @rpc("authority", "call_local", "reliable")
-func show_hit_feedback(slot: int) -> void:
+func apply_hit(slot: int, percent: float, impulse: Vector2, attacker: int) -> void:
 	var player = $player if slot == 0 else guest
+	player.damage_percent = percent
+	player.last_attacker = attacker
+	player.knockback_velocity += impulse
 	player.show_hit_feedback()
 
+func player_left_lifezone(player: Node2D) -> void:
+	if not playing or not multiplayer.is_server() or player not in [$player, guest]:
+		return
+	if not player.visible or player.lives <= 0 or player.respawn_grace > 0.0:
+		return
+	var zone := get_node_or_null("lifezone")
+	if zone != null and zone.contains_point(player.global_position):
+		return
+	var slot := 0 if player == $player else 1
+	if player.last_attacker >= 0 and player.last_attacker != slot:
+		var attacker = $player if player.last_attacker == 0 else guest
+		attacker.score += 1
+	player.lives -= 1
+	if guest_id != 0:
+		respawn.rpc(slot, player.lives)
+		sync_combat.rpc($player.damage_percent, guest.damage_percent, $player.lives, guest.lives, $player.score, guest.score)
+	else:
+		respawn(slot, player.lives)
+
 @rpc("authority", "call_local", "reliable")
-func respawn(slot: int) -> void:
+func respawn(slot: int, remaining_lives: int = -1) -> void:
 	_reset_remote_motion()
 	var player = $player if slot == 0 else guest
+	if remaining_lives >= 0:
+		player.lives = remaining_lives
+	player.spawn_generation += 1
 	player.position = _spawn_position(slot)
-	player.velocity = Vector2.ZERO
-	player.health = 100
-	player.jump_count = 0
-	player.buffercounter = 0.0
+	player.reset_combat()
+	if player.lives == 0:
+		playing = false
+		$player.local_control = false
+		guest.local_control = false
+		menu.show()
+		status.text = "Canların bitti! Yeniden başlamak için oyun modunu seç." if player == local_player else "Kazandın! Yeni maç için oyun modunu seç."
+		hud.text = "Maç bitti • Can: %d • Knockback: x%.2f" % [local_player.lives, local_player.knockback_multiplier]
+		$crosshair.hide()
+		Input.mouse_mode = Input.MOUSE_MODE_VISIBLE
 
 @rpc("authority", "call_remote", "reliable")
-func sync_health(host_health: int, guest_health: int, host_score: int, guest_score: int) -> void:
-	$player.health = host_health
-	guest.health = guest_health
+func sync_combat(host_damage: float, guest_damage: float, host_lives: int, guest_lives: int, host_score: int, guest_score: int) -> void:
+	$player.damage_percent = host_damage
+	guest.damage_percent = guest_damage
+	$player.lives = host_lives
+	guest.lives = guest_lives
 	$player.score = host_score
 	guest.score = guest_score
 

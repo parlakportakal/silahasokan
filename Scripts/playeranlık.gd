@@ -1,7 +1,30 @@
 extends CharacterBody2D
 
 var local_control: bool = false
-var health: int = 100
+@export var starting_lives: int = 3
+var lives: int = 3
+var spawn_generation: int = 0
+var damage_percent: float = 0.0
+var knockback_velocity := Vector2.ZERO
+var respawn_grace: float = 0.0
+var last_attacker: int = -1
+var knockback_multiplier: float:
+	get:
+		return 1.0 + damage_percent / 100.0
+
+func reset_combat() -> void:
+	damage_percent = 0.0
+	knockback_velocity = Vector2.ZERO
+	respawn_grace = 1.0
+	last_attacker = -1
+	velocity = Vector2.ZERO
+	jump_count = 0
+	buffercounter = 0.0
+	wall_coyote_counter = 0.0
+	last_wall_side = 0
+	last_wall_jump_side = 0
+	set_collision_mask_value(2, true)
+
 var score: int = 0
 var hit_flash: Tween
 
@@ -29,7 +52,8 @@ var last_wall_jump_side = 0
 
 
 func _physics_process(delta: float) -> void:
-	if not local_control:
+	respawn_grace = maxf(0.0, respawn_grace - delta)
+	if not local_control or lives <= 0:
 		return
 	var direction = Vector2.ZERO
 
@@ -106,4 +130,12 @@ func _physics_process(delta: float) -> void:
 			wall_coyote_counter = 0.0
 			buffercounter = 0
 
+	var movement_velocity := velocity
+	velocity += knockback_velocity
 	move_and_slide()
+	for index in range(get_slide_collision_count()):
+		knockback_velocity = knockback_velocity.slide(get_slide_collision(index).get_normal())
+	velocity = movement_velocity
+	if is_on_floor() or is_on_ceiling():
+		velocity.y = 0.0
+	knockback_velocity = knockback_velocity.move_toward(Vector2.ZERO, 650.0 * delta)

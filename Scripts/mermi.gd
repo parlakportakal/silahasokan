@@ -29,7 +29,7 @@ func _physics_process(delta):
 	var hit := get_world_2d().direct_space_state.intersect_ray(query)
 	if not hit.is_empty():
 		if multiplayer.is_server() and get_tree().current_scene.has_method("damage_player"):
-			get_tree().current_scene.damage_player(hit.collider, shooter, damage)
+			get_tree().current_scene.damage_player(hit.collider, shooter, damage, velocity.normalized())
 		queue_free()
 		return
 	global_position = next_position

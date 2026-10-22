@@ -29,7 +29,7 @@ func run_test() -> void:
 		await create_timer(0.1).timeout
 		if game.guest_id != 0 and game.playing:
 			break
-	check(game.guest_id != 0 and game.playing, "two peers connected")
+	check(game.guest_id != 0 and game.playing, "two peers connected: " + game.status.text)
 	if failed:
 		quit(1)
 		return
@@ -63,7 +63,7 @@ func run_test() -> void:
 		check(game.get_node("player").position.distance_to(Vector2(404, 300)) < 2.0, "host movement replicated")
 		await create_timer(3.0).timeout
 		check(game.get_node("player").score >= 1, "host score replicated after death")
-		check(game.local_player.health == 100, "respawn restores health")
+		check(game.local_player.damage_percent == 0 and game.local_player.lives == 2, "respawn resets damage and consumes one life")
 		game._leave("test")
 	else:
 		game.local_player.position = Vector2(404, 300)
@@ -72,13 +72,14 @@ func run_test() -> void:
 		check(game.guest.get_node("silaheksen").selected_weapon == 1, "client weapon replicated")
 		check(absf(game.guest.get_node("silaheksen").rotation - PI) < 0.01, "client aim replicated")
 		await create_timer(1.2).timeout
-		check(game.local_player.health < 100, "client shot damages host")
+		check(game.local_player.damage_percent > 0, "client shot damages host")
 		game.local_player.get_node("silaheksen").rotation = 0.0
 		game.local_player.get_node("silaheksen").select_weapon(0)
 		game.request_fire()
 		await create_timer(0.3).timeout
-		check(game.guest.health == 90, "host pistol damages client")
-		game.damage_player(game.guest, game.local_player, 100)
+		check(game.guest.damage_percent == 10, "host pistol damages client")
+		game.guest.position = Vector2(5000, 5000)
+		game.player_left_lifezone(game.guest)
 		check(game.local_player.score == 1, "server awards score")
 		await create_timer(4.0).timeout
 		check(game.guest_id == 0 and not game.guest.visible, "disconnect removes guest")
