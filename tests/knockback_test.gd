@@ -17,6 +17,7 @@ func run_test() -> void:
 	await physics_frame
 	var player = game.local_player
 	player.local_control = false
+	player.respawn_delay = 0.0
 	check(is_instance_valid(game.get_node_or_null("lifezone")), "lifezone survives game startup")
 	player.respawn_grace = 0.0
 	game.damage_player(player, game.guest, 10, Vector2.RIGHT)
@@ -36,6 +37,8 @@ func run_test() -> void:
 		player.respawn_grace = 0.0
 		player.position = Vector2(-5000, 0)
 		game.player_left_lifezone(player)
+		await physics_frame
+		await physics_frame
 	check(player.lives == 0 and not game.playing and game.menu.visible, "last life ends match")
 	game.solo_game()
 	check(player.lives == 3 and game.playing, "new game restores stocks")

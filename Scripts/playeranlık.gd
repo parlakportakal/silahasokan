@@ -2,6 +2,12 @@ extends CharacterBody2D
 
 var local_control: bool = false
 @export var starting_lives: int = 3
+@export_group("Yeniden Doğma")
+@export_range(0.0, 30.0, 0.1, "or_greater", "suffix:s") var respawn_delay: float = 2.0
+@export_range(0.0, 30.0, 0.1, "or_greater", "suffix:s") var respawn_invulnerability_duration: float = 2.0
+var respawning: bool = false
+var respawn_remaining: float = 0.0
+var blink_elapsed: float = 0.0
 var lives: int = 3
 var spawn_generation: int = 0
 var damage_percent: float = 0.0
@@ -15,7 +21,14 @@ var knockback_multiplier: float:
 func reset_combat() -> void:
 	damage_percent = 0.0
 	knockback_velocity = Vector2.ZERO
-	respawn_grace = 1.0
+	respawn_grace = 0.0
+	respawning = false
+	respawn_remaining = 0.0
+	blink_elapsed = 0.0
+	modulate.a = 1.0
+	if hit_flash != null and hit_flash.is_valid():
+		hit_flash.kill()
+	$Sprite2D.self_modulate = Color.WHITE
 	last_attacker = -1
 	velocity = Vector2.ZERO
 	jump_count = 0
@@ -53,7 +66,13 @@ var last_wall_jump_side = 0
 
 func _physics_process(delta: float) -> void:
 	respawn_grace = maxf(0.0, respawn_grace - delta)
-	if not local_control or lives <= 0:
+	if respawn_grace > 0.0:
+		blink_elapsed += delta
+		modulate.a = 0.2 if int(blink_elapsed / 0.1) % 2 == 0 else 1.0
+	else:
+		modulate.a = 1.0
+		blink_elapsed = 0.0
+	if not local_control or lives <= 0 or respawning:
 		return
 	var direction = Vector2.ZERO
 

@@ -20,8 +20,8 @@
 script = ExtResource("1_8gbba")
 
 [node name="lifezone" parent="." unique_id=1817054059 instance=ExtResource("2_wsu2k")]
-position = Vector2(595, 280)
-scale = Vector2(97.18, 97.18)
+position = Vector2(587, 275.00003)
+scale = Vector2(122.78001, 97.54)
 
 [node name="Arkaplan" type="Sprite2D" parent="." unique_id=1907234395]
 position = Vector2(563, 310.00003)

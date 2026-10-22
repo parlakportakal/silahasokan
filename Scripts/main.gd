@@ -192,6 +192,7 @@ func _peer_disconnected(id: int) -> void:
 	if multiplayer.is_server() and id == guest_id:
 		_reset_remote_motion()
 		guest_id = 0
+		guest.reset_combat()
 		guest.hide()
 		guest.collision_layer = 0
 		session_note = "Arkadaşın ayrıldı • Yeniden katılabilir"
@@ -217,6 +218,8 @@ func _leave(message: String) -> void:
 		player.reset_combat()
 		player.score = 0
 		player.get_node("silaheksen").select_weapon(0)
+	$player.show()
+	$player.collision_layer = 4
 	$player.position = _spawn_position(0)
 	guest.position = _spawn_position(1)
 	for child in get_children():
@@ -251,8 +254,17 @@ func _physics_process(delta: float) -> void:
 		return
 	if multiplayer.is_server():
 		for fighter in [$player, guest]:
+			if fighter.respawning:
+				fighter.respawn_remaining = maxf(0.0, fighter.respawn_remaining - delta)
+				if fighter.respawn_remaining <= 0.0:
+					var slot := 0 if fighter == $player else 1
+					if guest_id != 0:
+						finish_respawn.rpc(slot, fighter.respawn_invulnerability_duration)
+					else:
+						finish_respawn(slot, fighter.respawn_invulnerability_duration)
+				continue
 			var zone := get_node_or_null("lifezone")
-			if zone != null and fighter.visible and fighter.lives > 0 and fighter.respawn_grace <= 0.0 and not zone.contains_point(fighter.global_position):
+			if zone != null and fighter.visible and fighter.lives > 0 and not fighter.respawning and not zone.contains_point(fighter.global_position):
 				player_left_lifezone(fighter)
 	if not playing:
 		return
@@ -269,6 +281,8 @@ func _physics_process(delta: float) -> void:
 		client_state.rpc_id(1, local_player.position, local_player.velocity, axis.rotation, axis.selected_weapon, local_player.get_node("Sprite2D").flip_h, local_player.spawn_generation)
 
 func _apply_state(player: CharacterBody2D, pos: Vector2, vel: Vector2, angle: float, weapon: int, flip: bool) -> void:
+	if player.respawning or not playing:
+		return
 	if not pos.is_finite() or not vel.is_finite() or not is_finite(angle) or weapon < 0 or weapon > 1:
 		return
 	player.position = pos
@@ -308,7 +322,7 @@ func host_state(pos: Vector2, vel: Vector2, angle: float, weapon: int, flip: boo
 		_apply_state($player, pos, vel, angle, weapon, flip)
 
 func request_fire() -> void:
-	if not playing or menu.visible:
+	if not playing or menu.visible or local_player.respawning or local_player.lives <= 0:
 		return
 	var axis = local_player.get_node("silaheksen")
 	if multiplayer.is_server():
@@ -336,7 +350,7 @@ func _server_fire(slot: int, angle: float, weapon: int, shot_id: int = 0, origin
 		return
 	var player = $player if slot == 0 else guest
 	var axis = player.get_node("silaheksen")
-	if axis.weapons[weapon].cooldown > 0.0:
+	if not playing or player.respawning or player.lives <= 0 or axis.weapons[weapon].cooldown > 0.0:
 		if slot == 1:
 			reject_shot.rpc_id(guest_id, shot_id)
 		return
@@ -381,7 +395,7 @@ func show_shot(slot: int, pos: Vector2, angle: float, weapon: int, shot_id: int 
 func damage_player(target: Object, shooter: Object, amount: int, hit_direction: Vector2 = Vector2.RIGHT) -> void:
 	if not playing or not multiplayer.is_server() or target not in [$player, guest] or target == shooter:
 		return
-	if target.lives <= 0 or target.respawn_grace > 0.0:
+	if target.lives <= 0 or target.respawning or not target.visible or target.respawn_grace > 0.0:
 		return
 	var slot := 0 if target == $player else 1
 	var percent: float = target.damage_percent + maxf(amount, 0)
@@ -404,7 +418,7 @@ func apply_hit(slot: int, percent: float, impulse: Vector2, attacker: int) -> vo
 func player_left_lifezone(player: Node2D) -> void:
 	if not playing or not multiplayer.is_server() or player not in [$player, guest]:
 		return
-	if not player.visible or player.lives <= 0 or player.respawn_grace > 0.0:
+	if not player.visible or player.lives <= 0 or player.respawning:
 		return
 	var zone := get_node_or_null("lifezone")
 	if zone != null and zone.contains_point(player.global_position):
@@ -427,8 +441,11 @@ func respawn(slot: int, remaining_lives: int = -1) -> void:
 	if remaining_lives >= 0:
 		player.lives = remaining_lives
 	player.spawn_generation += 1
-	player.position = _spawn_position(slot)
 	player.reset_combat()
+	player.hide()
+	player.collision_layer = 0
+	player.respawning = player.lives > 0
+	player.respawn_remaining = player.respawn_delay
 	if player.lives == 0:
 		playing = false
 		$player.local_control = false
@@ -438,6 +455,20 @@ func respawn(slot: int, remaining_lives: int = -1) -> void:
 		hud.text = "Maç bitti • Can: %d • Knockback: x%.2f" % [local_player.lives, local_player.knockback_multiplier]
 		$crosshair.hide()
 		Input.mouse_mode = Input.MOUSE_MODE_VISIBLE
+
+@rpc("authority", "call_local", "reliable")
+func finish_respawn(slot: int, protection_duration: float) -> void:
+	var player = $player if slot == 0 else guest
+	if not playing or not player.respawning or player.lives <= 0:
+		return
+	_reset_remote_motion()
+	player.spawn_generation += 1
+	player.position = _spawn_position(slot)
+	player.reset_combat()
+	player.respawn_grace = maxf(0.0, protection_duration)
+	player.modulate.a = 0.2 if player.respawn_grace > 0.0 else 1.0
+	player.collision_layer = 4
+	player.show()
 
 @rpc("authority", "call_remote", "reliable")
 func sync_combat(host_damage: float, guest_damage: float, host_lives: int, guest_lives: int, host_score: int, guest_score: int) -> void:
