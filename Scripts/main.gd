@@ -247,7 +247,7 @@ func _process(delta: float) -> void:
 	if not playing:
 		return
 	_render_remote_player()
-	hud.text = "%s\nCan: %d • Hasar: %.0f%% • Knockback: x%.2f\nSkor: %d - %d • 1: Pistol / 2: Pompalı • Esc: Menü" % [session_note, local_player.lives, local_player.damage_percent, local_player.knockback_multiplier, $player.score, guest.score]
+	hud.text = "%s\nCan: %d • Hasar: %.0f%% • Knockback: x%.2f\nSkor: %d - %d • 1: Pistol / 2: Pompalı • Sağ tık: Hook • W: İpe tırman • Esc: Menü" % [session_note, local_player.lives, local_player.damage_percent, local_player.knockback_multiplier, $player.score, guest.score]
 
 func _physics_process(delta: float) -> void:
 	if not playing:
@@ -276,9 +276,9 @@ func _physics_process(delta: float) -> void:
 	var axis = local_player.get_node("silaheksen")
 	if multiplayer.is_server():
 		if guest_id != 0:
-			host_state.rpc(local_player.position, local_player.velocity, axis.rotation, axis.selected_weapon, local_player.get_node("Sprite2D").flip_h, local_player.spawn_generation)
+			host_state.rpc(local_player.position, local_player.velocity, axis.rotation, axis.selected_weapon, local_player.get_node("Sprite2D").flip_h, local_player.spawn_generation, local_player.hook.state, local_player.hook.tip, local_player.hook.outgoing_pull)
 	else:
-		client_state.rpc_id(1, local_player.position, local_player.velocity, axis.rotation, axis.selected_weapon, local_player.get_node("Sprite2D").flip_h, local_player.spawn_generation)
+		client_state.rpc_id(1, local_player.position, local_player.velocity, axis.rotation, axis.selected_weapon, local_player.get_node("Sprite2D").flip_h, local_player.spawn_generation, local_player.hook.state, local_player.hook.tip, local_player.hook.outgoing_pull)
 
 func _apply_state(player: CharacterBody2D, pos: Vector2, vel: Vector2, angle: float, weapon: int, flip: bool) -> void:
 	if player.respawning or not playing:
@@ -312,14 +312,16 @@ func _reset_remote_motion() -> void:
 		player.get_node("silaheksen").position = Vector2.ZERO
 
 @rpc("any_peer", "call_remote", "unreliable_ordered", 1)
-func client_state(pos: Vector2, vel: Vector2, angle: float, weapon: int, flip: bool, generation: int = 0) -> void:
+func client_state(pos: Vector2, vel: Vector2, angle: float, weapon: int, flip: bool, generation: int = 0, hook_state: int = 0, hook_tip: Vector2 = Vector2.ZERO, hook_pull: Vector2 = Vector2.ZERO) -> void:
 	if multiplayer.is_server() and multiplayer.get_remote_sender_id() == guest_id and generation == guest.spawn_generation:
 		_apply_state(guest, pos, vel, angle, weapon, flip)
+		_apply_hook_state(guest, hook_state, hook_tip, hook_pull)
 
 @rpc("authority", "call_remote", "unreliable_ordered", 1)
-func host_state(pos: Vector2, vel: Vector2, angle: float, weapon: int, flip: bool, generation: int = 0) -> void:
+func host_state(pos: Vector2, vel: Vector2, angle: float, weapon: int, flip: bool, generation: int = 0, hook_state: int = 0, hook_tip: Vector2 = Vector2.ZERO, hook_pull: Vector2 = Vector2.ZERO) -> void:
 	if generation == $player.spawn_generation:
 		_apply_state($player, pos, vel, angle, weapon, flip)
+		_apply_hook_state($player, hook_state, hook_tip, hook_pull)
 
 func request_fire() -> void:
 	if not playing or menu.visible or local_player.respawning or local_player.lives <= 0:
@@ -448,6 +450,8 @@ func respawn(slot: int, remaining_lives: int = -1) -> void:
 	player.respawn_remaining = player.respawn_delay
 	if player.lives == 0:
 		playing = false
+		$player.hook.reset()
+		guest.hook.reset()
 		$player.local_control = false
 		guest.local_control = false
 		menu.show()
@@ -488,5 +492,16 @@ func _input(event: InputEvent) -> void:
 	if event is InputEventKey and event.pressed and not event.echo and event.keycode == KEY_ESCAPE and playing:
 		menu.visible = not menu.visible
 		local_player.local_control = not menu.visible
+		if menu.visible:
+			local_player.hook.reset()
 		$crosshair.visible = not menu.visible
 		Input.mouse_mode = Input.MOUSE_MODE_VISIBLE if menu.visible else Input.MOUSE_MODE_CONFINED_HIDDEN
+
+func _apply_hook_state(player: CharacterBody2D, state: int, tip: Vector2, pull: Vector2 = Vector2.ZERO) -> void:
+	if player.respawning or not playing or state < 0 or state > 4 or not tip.is_finite() or not pull.is_finite():
+		return
+	player.hook.state = state
+	player.hook.tip = tip
+	player.hook.queue_redraw()
+	if local_player != null and not local_player.respawning and local_player.lives > 0:
+		local_player.receive_hook_pull(pull.limit_length(player.hook.climb_speed * 0.15) if state == 2 else Vector2.ZERO)

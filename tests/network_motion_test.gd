@@ -67,6 +67,14 @@ func run_test() -> void:
 	game.show_shot(1, Vector2(500, 300), 0.0, 0)
 	var bullet = game.get_child(game.get_child_count() - 1)
 	check(bullet.global_position.is_equal_approx(Vector2(542, 298)), "shot uses real muzzle instead of delayed visual offset")
+	game._apply_hook_state(game.guest, 2, Vector2(500, 300), Vector2(33, 0))
+	check(game.local_player.hook_pull_velocity == Vector2(33, 0), "remote hook applies target share to local player")
+	game._apply_hook_state(game.guest, 4, Vector2(500, 350))
+	check(game.guest.hook.state == 4 and game.local_player.hook_pull_velocity == Vector2.ZERO, "falling state synchronizes and clears target pull")
+	game.local_player.local_control = false
+	game.local_player.receive_hook_pull(Vector2(33, 0))
+	game.local_player._physics_process(0.2)
+	check(game.local_player.hook_pull_velocity == Vector2.ZERO, "missing network updates expire target pull")
 	game.respawn(1)
 	check(game.remote_motion.samples.is_empty() and game.guest.get_node("silaheksen").position == Vector2.ZERO, "respawn resets visual offsets and history")
 	game.guest_id = 0

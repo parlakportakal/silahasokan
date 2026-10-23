@@ -1,5 +1,19 @@
 extends CharacterBody2D
 
+var hook_pull_velocity := Vector2.ZERO
+var hook_pull_remaining: float = 0.0
+
+func receive_hook_pull(pull: Vector2) -> void:
+	hook_pull_velocity = pull
+	hook_pull_remaining = 0.15
+
+var hook: Node2D
+
+func _ready() -> void:
+	hook = preload("res://Scripts/grappling_hook.gd").new()
+	hook.name = "GrapplingHook"
+	add_child(hook)
+
 var local_control: bool = false
 @export var starting_lives: int = 3
 @export_group("Yeniden Doğma")
@@ -19,6 +33,10 @@ var knockback_multiplier: float:
 		return 1.0 + damage_percent / 100.0
 
 func reset_combat() -> void:
+	hook_pull_velocity = Vector2.ZERO
+	hook_pull_remaining = 0.0
+	if hook != null:
+		hook.reset()
 	damage_percent = 0.0
 	knockback_velocity = Vector2.ZERO
 	respawn_grace = 0.0
@@ -65,6 +83,9 @@ var last_wall_jump_side = 0
 
 
 func _physics_process(delta: float) -> void:
+	hook_pull_remaining = maxf(0.0, hook_pull_remaining - delta)
+	if hook_pull_remaining <= 0.0:
+		hook_pull_velocity = Vector2.ZERO
 	respawn_grace = maxf(0.0, respawn_grace - delta)
 	if respawn_grace > 0.0:
 		blink_elapsed += delta
@@ -72,6 +93,11 @@ func _physics_process(delta: float) -> void:
 	else:
 		modulate.a = 1.0
 		blink_elapsed = 0.0
+	if local_control:
+		var axis := get_node_or_null("silaheksen")
+		hook.step(delta, lives > 0 and not respawning and axis != null and axis.selected_weapon == 1)
+	elif hook.state != hook.State.IDLE:
+		hook.queue_redraw()
 	if not local_control or lives <= 0 or respawning:
 		return
 	var direction = Vector2.ZERO
@@ -129,12 +155,15 @@ func _physics_process(delta: float) -> void:
 	if direction.x > 0:
 		$Sprite2D.flip_h = false
 
-	if direction.x != 0:
+	if hook.state == hook.State.ATTACHED:
+		velocity.x += direction.x * hook.swing_acceleration * delta
+	elif direction.x != 0:
 		velocity.x = move_toward(velocity.x, direction.x * speed, acceleration * delta)
 	else:
 		velocity.x = move_toward(velocity.x, 0, friction * delta)
 
-	velocity.x = clamp(velocity.x, -speed, speed)
+	if hook.state != hook.State.ATTACHED:
+		velocity.x = clamp(velocity.x, -speed, speed)
 
 	# Wall slide
 	if duvarda and not is_on_floor():
@@ -150,8 +179,12 @@ func _physics_process(delta: float) -> void:
 			buffercounter = 0
 
 	var movement_velocity := velocity
-	velocity += knockback_velocity
+	velocity += knockback_velocity + hook_pull_velocity
+	hook.constrain(delta)
+	if hook.state == hook.State.ATTACHED:
+		movement_velocity = velocity - knockback_velocity - hook_pull_velocity
 	move_and_slide()
+	hook.correct_position()
 	for index in range(get_slide_collision_count()):
 		knockback_velocity = knockback_velocity.slide(get_slide_collision(index).get_normal())
 	velocity = movement_velocity
