@@ -3,6 +3,7 @@ extends Control
 # Oyun sahnesini Inspector'dan değiştirebilirsin.
 @export_file("*.tscn") var game_scene_path: String = "res://Scenes/main.tscn"
 @export_file("*.tscn") var level_2_scene_path: String = "res://Scenes/el_banyo.tscn"
+@export_file("*.tscn") var level_3_scene_path: String = "res://Scenes/el_kanyon.tscn"
 var selected_mode: String = "online"
 
 func _ready() -> void:
@@ -38,6 +39,9 @@ func _on_level_1_pressed() -> void:
 
 func _on_level_2_pressed() -> void:
 	_open_game(level_2_scene_path)
+
+func _on_level_3_pressed() -> void:
+	_open_game(level_3_scene_path)
 
 func _open_game(scene_path: String) -> void:
 	get_tree().set_meta("launch_mode", selected_mode)
