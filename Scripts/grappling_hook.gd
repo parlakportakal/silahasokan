@@ -79,12 +79,12 @@ func _advance_tip(next: Vector2) -> void:
 	rope_length = maxf(minimum_length, player.global_position.distance_to(anchor))
 	state = State.ATTACHED
 
-func step(delta: float, enabled: bool) -> void:
+func step(delta: float, enabled: bool, controls: Dictionary = {}) -> void:
 	outgoing_pull = Vector2.ZERO
-	if not enabled or not Input.is_action_pressed("sagtik"):
+	if not enabled or not controls.get("held", Input.is_action_pressed("sagtik")):
 		release()
-	elif Input.is_action_just_pressed("sagtik"):
-		fire(get_global_mouse_position())
+	elif controls.get("pressed", Input.is_action_just_pressed("sagtik")):
+		fire(controls.get("target", get_global_mouse_position()))
 	if state == State.FLYING:
 		var distance := minf(launch_speed * delta, max_range - travel)
 		travel += distance
@@ -102,7 +102,7 @@ func step(delta: float, enabled: bool) -> void:
 		else:
 			anchor = target_body.to_global(target_offset)
 			tip = anchor
-			if can_climb() and (Input.is_action_pressed("hook_up") or attached_to_player()):
+			if can_climb() and (controls.get("reel", Input.is_action_pressed("hook_up")) or attached_to_player()):
 				var reel_speed := climb_speed
 				if attached_to_player():
 					var separation := player.global_position.distance_to(anchor)

@@ -51,11 +51,12 @@ func _process(delta: float) -> void:
 	var targets: Array[Vector2] = []
 	for node in get_tree().get_nodes_in_group(target_group):
 		if node is Node2D and node.is_visible_in_tree() and get_tree().current_scene.is_ancestor_of(node):
-			targets.append(node.global_position)
-			# Ağda yumuşatılmış oyuncu görüntüsü de kadrajda kalsın.
+			# Track the rendered position, not both it and the latest network packet.
 			var sprite := node.get_node_or_null("Sprite2D") as Node2D
 			if sprite != null:
 				targets.append(sprite.global_position)
+			else:
+				targets.append(node.global_position)
 	if targets.is_empty():
 		return
 	frame_targets(targets, delta)
@@ -69,19 +70,19 @@ func frame_targets(targets: Array[Vector2], delta: float) -> void:
 	var frame_size := (bounds.size + player_padding * 2.0).max(minimum_frame_size)
 	var viewport := get_viewport_rect().size
 	var target_zoom := minf(maximum_zoom, minf(viewport.x / frame_size.x, viewport.y / frame_size.y))
-	var center := bounds.get_center()
-	# Harita kenarında mümkün olduğunca dışarıyı göstermeden oyuncuları takip et.
-	var half_view := viewport / target_zoom * 0.5
+	# Widen immediately for separated players; close in smoothly afterwards.
+	var next_zoom := minf(target_zoom, lerpf(zoom.x, target_zoom, 1.0 - exp(-zoom_speed * delta)))
+	var half_view := viewport / maxf(next_zoom, 0.001) * 0.5
+	var center := global_position.lerp(bounds.get_center(), 1.0 - exp(-follow_speed * delta))
 	for axis in range(2):
+		# Keep the map edge stable using the actual zoom for this frame.
 		if half_view[axis] * 2.0 >= map_bounds.size[axis]:
 			center[axis] = map_bounds.get_center()[axis]
 		else:
 			center[axis] = clampf(center[axis], map_bounds.position[axis] + half_view[axis], map_bounds.end[axis] - half_view[axis])
-	global_position = global_position.lerp(center, 1.0 - exp(-follow_speed * delta))
-	var next_zoom := lerpf(zoom.x, target_zoom, 1.0 - exp(-zoom_speed * delta))
-	# Oyuncu hızla uzaklaşır veya yeniden doğarsa kadraj dışına çıkmasını önle.
-	var required_half := Vector2.ONE
-	for point in targets:
-		required_half = required_half.max((point - global_position).abs() + player_padding)
-	var safe_zoom := minf(viewport.x / (required_half.x * 2.0), viewport.y / (required_half.y * 2.0))
-	zoom = Vector2.ONE * minf(next_zoom, safe_zoom)
+		# Correct camera lag instead of zooming out on every jump or swing.
+		var low := bounds.end[axis] + player_padding[axis] - half_view[axis]
+		var high := bounds.position[axis] - player_padding[axis] + half_view[axis]
+		center[axis] = clampf(center[axis], low, high) if low <= high else bounds.get_center()[axis]
+	global_position = center
+	zoom = Vector2.ONE * next_zoom

@@ -9,7 +9,7 @@ func check(ok: bool, message: String) -> void:
 	else:
 		print("PASS: " + message)
 func run_check() -> void:
-	for path in ["res://Scenes/main.tscn", "res://Scenes/el_banyo.tscn"]:
+	for path in ["res://Scenes/main.tscn", "res://Scenes/el_banyo.tscn", "res://Scenes/el_kanyon.tscn"]:
 		var game = load(path).instantiate()
 		root.add_child(game)
 		current_scene = game
@@ -26,6 +26,13 @@ func run_check() -> void:
 			cam._process(1.0 / 60.0)
 		check(cam.zoom.x > full_zoom, "nearby players cause smooth zoom in")
 		var close_zoom: float = cam.zoom.x
+		for i in range(60):
+			game.local_player.position.x += 12.0
+			game.local_player.position.y += sin(i * 0.2) * 6.0
+			cam._process(1.0 / 60.0)
+		check(absf(cam.zoom.x - close_zoom) < 0.002, "solo running and swinging do not pump camera zoom")
+		if path.ends_with("el_kanyon.tscn"):
+			check(cam.zoom.x <= 1.1, "canyon uses wider map-specific view")
 		game.guest.visible = true
 		game.guest.position = Vector2(1050, 500)
 		game.local_player.position = Vector2(100, 200)

@@ -20,6 +20,7 @@ var connect_time := 0.0
 var send_time := 0.0
 var local_player: CharacterBody2D
 var guest: CharacterBody2D
+var bot: CharacterBody2D
 var camera: Camera2D
 var menu: PanelContainer
 var address: LineEdit
@@ -198,6 +199,10 @@ func _peer_disconnected(id: int) -> void:
 		session_note = "Arkadaşın ayrıldı • Yeniden katılabilir"
 
 func _leave(message: String) -> void:
+	if is_instance_valid(bot):
+		remove_child(bot)
+		bot.queue_free()
+	bot = null
 	camera.end_match()
 	predicted_shots.clear()
 	shot_sequence = 0
@@ -251,8 +256,11 @@ func _process(delta: float) -> void:
 
 func _physics_process(delta: float) -> void:
 	if not playing:
+		if is_instance_valid(bot):
+			bot.bot_control = false
 		return
 	if multiplayer.is_server():
+		_update_bot(delta)
 		for fighter in [$player, guest]:
 			if fighter.respawning:
 				fighter.respawn_remaining = maxf(0.0, fighter.respawn_remaining - delta)
@@ -276,9 +284,11 @@ func _physics_process(delta: float) -> void:
 	var axis = local_player.get_node("silaheksen")
 	if multiplayer.is_server():
 		if guest_id != 0:
-			host_state.rpc(local_player.position, local_player.velocity, axis.rotation, axis.selected_weapon, local_player.get_node("Sprite2D").flip_h, local_player.spawn_generation, local_player.hook.state, local_player.hook.tip, local_player.hook.outgoing_pull)
+			if is_instance_valid(bot):
+				bot_state.rpc(bot.position, bot.velocity, bot.bot_home, bot.damage_percent, bot.lives, bot.respawning, bot.respawn_grace, bot.hook.state, bot.hook.tip, bot.get_node("silaheksen").rotation)
+			host_state.rpc(local_player.position, local_player.velocity, axis.rotation, axis.selected_weapon, local_player.get_node("Sprite2D").flip_h, local_player.spawn_generation, local_player.hook.state, local_player.hook.tip, local_player.hook.outgoing_pull, local_player.hook.target_body == bot and is_instance_valid(bot))
 	else:
-		client_state.rpc_id(1, local_player.position, local_player.velocity, axis.rotation, axis.selected_weapon, local_player.get_node("Sprite2D").flip_h, local_player.spawn_generation, local_player.hook.state, local_player.hook.tip, local_player.hook.outgoing_pull)
+		client_state.rpc_id(1, local_player.position, local_player.velocity, axis.rotation, axis.selected_weapon, local_player.get_node("Sprite2D").flip_h, local_player.spawn_generation, local_player.hook.state, local_player.hook.tip, local_player.hook.outgoing_pull, local_player.hook.target_body == bot and is_instance_valid(bot))
 
 func _apply_state(player: CharacterBody2D, pos: Vector2, vel: Vector2, angle: float, weapon: int, flip: bool) -> void:
 	if player.respawning or not playing:
@@ -312,16 +322,16 @@ func _reset_remote_motion() -> void:
 		player.get_node("silaheksen").position = Vector2.ZERO
 
 @rpc("any_peer", "call_remote", "unreliable_ordered", 1)
-func client_state(pos: Vector2, vel: Vector2, angle: float, weapon: int, flip: bool, generation: int = 0, hook_state: int = 0, hook_tip: Vector2 = Vector2.ZERO, hook_pull: Vector2 = Vector2.ZERO) -> void:
+func client_state(pos: Vector2, vel: Vector2, angle: float, weapon: int, flip: bool, generation: int = 0, hook_state: int = 0, hook_tip: Vector2 = Vector2.ZERO, hook_pull: Vector2 = Vector2.ZERO, pull_bot: bool = false) -> void:
 	if multiplayer.is_server() and multiplayer.get_remote_sender_id() == guest_id and generation == guest.spawn_generation:
 		_apply_state(guest, pos, vel, angle, weapon, flip)
-		_apply_hook_state(guest, hook_state, hook_tip, hook_pull)
+		_apply_hook_state(guest, hook_state, hook_tip, hook_pull, pull_bot)
 
 @rpc("authority", "call_remote", "unreliable_ordered", 1)
-func host_state(pos: Vector2, vel: Vector2, angle: float, weapon: int, flip: bool, generation: int = 0, hook_state: int = 0, hook_tip: Vector2 = Vector2.ZERO, hook_pull: Vector2 = Vector2.ZERO) -> void:
+func host_state(pos: Vector2, vel: Vector2, angle: float, weapon: int, flip: bool, generation: int = 0, hook_state: int = 0, hook_tip: Vector2 = Vector2.ZERO, hook_pull: Vector2 = Vector2.ZERO, pull_bot: bool = false) -> void:
 	if generation == $player.spawn_generation:
 		_apply_state($player, pos, vel, angle, weapon, flip)
-		_apply_hook_state($player, hook_state, hook_tip, hook_pull)
+		_apply_hook_state($player, hook_state, hook_tip, hook_pull, pull_bot)
 
 func request_fire() -> void:
 	if not playing or menu.visible or local_player.respawning or local_player.lives <= 0:
@@ -395,11 +405,11 @@ func show_shot(slot: int, pos: Vector2, angle: float, weapon: int, shot_id: int 
 		axis.select_weapon(old_weapon)
 
 func damage_player(target: Object, shooter: Object, amount: int, hit_direction: Vector2 = Vector2.RIGHT) -> void:
-	if not playing or not multiplayer.is_server() or target not in [$player, guest] or target == shooter:
+	if not playing or not multiplayer.is_server() or target not in [$player, guest, bot] or target == null or target == shooter:
 		return
 	if target.lives <= 0 or target.respawning or not target.visible or target.respawn_grace > 0.0:
 		return
-	var slot := 0 if target == $player else 1
+	var slot := 2 if target == bot else (0 if target == $player else 1)
 	var percent: float = target.damage_percent + maxf(amount, 0)
 	var impulse := hit_direction.normalized() * (260.0 + amount * 6.0) * (1.0 + percent / 100.0)
 	impulse.y -= 100.0
@@ -411,7 +421,9 @@ func damage_player(target: Object, shooter: Object, amount: int, hit_direction: 
 
 @rpc("authority", "call_local", "reliable")
 func apply_hit(slot: int, percent: float, impulse: Vector2, attacker: int) -> void:
-	var player = $player if slot == 0 else guest
+	var player = bot if slot == 2 else ($player if slot == 0 else guest)
+	if not is_instance_valid(player):
+		return
 	player.damage_percent = percent
 	player.last_attacker = attacker
 	player.knockback_velocity += impulse
@@ -489,6 +501,11 @@ func _fit_camera_to_map() -> void:
 	camera.configure_map(bounds)
 
 func _input(event: InputEvent) -> void:
+	if event is InputEventKey and event.pressed and not event.echo and event.physical_keycode == KEY_B and playing and not menu.visible:
+		if multiplayer.is_server():
+			request_bot()
+		else:
+			request_bot.rpc_id(1)
 	if event is InputEventKey and event.pressed and not event.echo and event.keycode == KEY_ESCAPE and playing:
 		menu.visible = not menu.visible
 		local_player.local_control = not menu.visible
@@ -497,11 +514,93 @@ func _input(event: InputEvent) -> void:
 		$crosshair.visible = not menu.visible
 		Input.mouse_mode = Input.MOUSE_MODE_VISIBLE if menu.visible else Input.MOUSE_MODE_CONFINED_HIDDEN
 
-func _apply_hook_state(player: CharacterBody2D, state: int, tip: Vector2, pull: Vector2 = Vector2.ZERO) -> void:
+func _apply_hook_state(player: CharacterBody2D, state: int, tip: Vector2, pull: Vector2 = Vector2.ZERO, pull_bot: bool = false) -> void:
 	if player.respawning or not playing or state < 0 or state > 4 or not tip.is_finite() or not pull.is_finite():
 		return
 	player.hook.state = state
 	player.hook.tip = tip
 	player.hook.queue_redraw()
+	if pull_bot:
+		if multiplayer.is_server() and is_instance_valid(bot) and not bot.respawning and bot.lives > 0:
+			bot.receive_hook_pull(pull.limit_length(player.hook.climb_speed * 0.15) if state == 2 else Vector2.ZERO)
+		return
 	if local_player != null and not local_player.respawning and local_player.lives > 0:
 		local_player.receive_hook_pull(pull.limit_length(player.hook.climb_speed * 0.15) if state == 2 else Vector2.ZERO)
+
+@rpc("any_peer", "call_remote", "reliable")
+func request_bot() -> void:
+	if not playing or not multiplayer.is_server() or is_instance_valid(bot):
+		return
+	var sender := multiplayer.get_remote_sender_id()
+	if sender != 0 and sender != guest_id:
+		return
+	var home := to_global(_spawn_position(1))
+	if guest_id != 0:
+		spawn_bot.rpc(home)
+	else:
+		spawn_bot(home)
+
+@rpc("authority", "call_local", "reliable")
+func spawn_bot(home: Vector2) -> void:
+	if is_instance_valid(bot):
+		return
+	# Instantiate a clean character; do not copy live timers or hook state.
+	bot = preload("res://Scenes/player.tscn").instantiate()
+	bot.name = "TrainingBot"
+	add_child(bot)
+	var axis = $player.get_node("silaheksen").duplicate()
+	bot.add_child(axis)
+	bot.global_position = home
+	bot.bot_home = home
+	bot.bot_control = multiplayer.is_server()
+	bot.collision_layer = 4
+	bot.get_node("Sprite2D").modulate = Color(1.0, 0.7, 0.25)
+	bot.add_to_group("camera_players")
+	bot.reset_combat()
+	var label := Label.new()
+	label.text = "AI"
+	label.position = Vector2(-10, -55)
+	bot.add_child(label)
+
+func _update_bot(delta: float) -> void:
+	if not is_instance_valid(bot):
+		return
+	if bot.respawning:
+		bot.respawn_remaining -= delta
+		if bot.respawn_remaining <= 0.0:
+			bot.global_position = bot.bot_home
+			bot.reset_combat()
+			bot.respawn_grace = bot.respawn_invulnerability_duration
+			bot.collision_layer = 4
+			bot.show()
+		return
+	var zone = get_node_or_null("lifezone")
+	var outside: bool = not zone.contains_point(bot.global_position) if zone != null else bot.global_position.y > camera.map_bounds.end.y + 400
+	if outside and bot.lives > 0:
+		bot.lives -= 1
+		bot.reset_combat()
+		bot.hide()
+		bot.collision_layer = 0
+		bot.respawning = bot.lives > 0
+		bot.respawn_remaining = bot.respawn_delay
+
+@rpc("authority", "call_remote", "unreliable_ordered", 2)
+func bot_state(pos: Vector2, vel: Vector2, home: Vector2, damage: float, stocks: int, waiting: bool, grace: float, hook_state: int = 0, hook_tip: Vector2 = Vector2.ZERO, aim: float = 0.0) -> void:
+	if not playing:
+		return
+	if not is_instance_valid(bot):
+		spawn_bot(home)
+	bot.position = pos
+	bot.velocity = vel
+	bot.damage_percent = damage
+	bot.lives = stocks
+	bot.respawning = waiting
+	bot.respawn_grace = grace
+	bot.visible = stocks > 0 and not waiting
+	bot.collision_layer = 4 if bot.visible else 0
+	bot.get_node("Sprite2D").flip_h = vel.x < 0
+	bot.hook.state = hook_state
+	bot.hook.tip = hook_tip
+	bot.hook.queue_redraw()
+	bot.get_node("silaheksen").select_weapon(1)
+	bot.get_node("silaheksen").rotation = aim

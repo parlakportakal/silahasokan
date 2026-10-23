@@ -15,6 +15,11 @@ func _ready() -> void:
 	add_child(hook)
 
 var local_control: bool = false
+var bot_control: bool = false
+var bot_home := Vector2.ZERO
+var bot_brain = preload("res://Scripts/bot_movement.gd").new()
+var bot_actions: Dictionary = {}
+var drop_remaining: float = 0.0
 @export var starting_lives: int = 3
 @export_group("Yeniden Doğma")
 @export_range(0.0, 30.0, 0.1, "or_greater", "suffix:s") var respawn_delay: float = 2.0
@@ -33,6 +38,9 @@ var knockback_multiplier: float:
 		return 1.0 + damage_percent / 100.0
 
 func reset_combat() -> void:
+	bot_brain = preload("res://Scripts/bot_movement.gd").new()
+	bot_actions.clear()
+	drop_remaining = 0.0
 	hook_pull_velocity = Vector2.ZERO
 	hook_pull_remaining = 0.0
 	if hook != null:
@@ -83,6 +91,18 @@ var last_wall_jump_side = 0
 
 
 func _physics_process(delta: float) -> void:
+	if drop_remaining > 0.0:
+		drop_remaining = maxf(0.0, drop_remaining - delta)
+		if drop_remaining == 0.0:
+			set_collision_mask_value(2, true)
+	if bot_control and lives > 0 and not respawning:
+		bot_actions = bot_brain.decide(self, delta)
+		var axis := get_node_or_null("silaheksen")
+		if axis != null:
+			axis.select_weapon(1)
+			if bot_actions.get("held", false):
+				axis.look_at(bot_actions.get("target", bot_home))
+		hook.step(delta, true, bot_actions)
 	hook_pull_remaining = maxf(0.0, hook_pull_remaining - delta)
 	if hook_pull_remaining <= 0.0:
 		hook_pull_velocity = Vector2.ZERO
@@ -98,7 +118,7 @@ func _physics_process(delta: float) -> void:
 		hook.step(delta, lives > 0 and not respawning and axis != null and axis.selected_weapon == 1)
 	elif hook.state != hook.State.IDLE:
 		hook.queue_redraw()
-	if not local_control or lives <= 0 or respawning:
+	if (not local_control and not bot_control) or lives <= 0 or respawning:
 		return
 	var direction = Vector2.ZERO
 
@@ -118,7 +138,7 @@ func _physics_process(delta: float) -> void:
 			last_wall_side = -1
 		wall_coyote_counter = wall_coyote_time
 
-	if Input.is_action_just_pressed("zipla"):
+	if (local_control and Input.is_action_just_pressed("zipla")) or (bot_control and bot_actions.get("jump", false)):
 		buffercounter = buffertime
 	buffercounter = max(buffercounter - delta, 0.0)
 
@@ -140,15 +160,16 @@ func _physics_process(delta: float) -> void:
 		velocity.y = -jump_force
 		buffercounter = 0
 
-	if Input.is_action_just_pressed("asagi") and is_on_floor():
+	if is_on_floor() and drop_remaining <= 0.0 and ((local_control and Input.is_action_just_pressed("asagi")) or (bot_control and bot_actions.get("drop", false))):
 		set_collision_mask_value(2, false)
-		await get_tree().create_timer(0.2).timeout
-		set_collision_mask_value(2, true)
+		drop_remaining = 0.2
 
-	if Input.is_action_pressed("saga"):
+	if local_control and Input.is_action_pressed("saga"):
 		direction.x += 1
-	if Input.is_action_pressed("sola"):
+	if local_control and Input.is_action_pressed("sola"):
 		direction.x -= 1
+	if bot_control:
+		direction.x = bot_actions.get("direction", 0.0)
 
 	if direction.x < 0:
 		$Sprite2D.flip_h = true

@@ -3,8 +3,19 @@
 [ext_resource type="Texture2D" uid="uid://nt41onhq1vlu" path="res://Assets/civirzivir/el kanyon.png" id="1_sas8h"]
 [ext_resource type="PackedScene" uid="uid://835xbk7lq8cw" path="res://Scenes/platform.tscn" id="2_oghwx"]
 [ext_resource type="PackedScene" uid="uid://cm10pumbey81a" path="res://Scenes/duvar.tscn" id="3_x0k57"]
+[ext_resource type="Script" uid="uid://b0rl2noq8ga8i" path="res://Scripts/main.gd" id="4_game"]
+[ext_resource type="PackedScene" uid="uid://cmtgnb445pe26" path="res://Scenes/player.tscn" id="5_player"]
+[ext_resource type="Script" uid="uid://kcsrp7svk77k" path="res://Scripts/silah_ekseni.gd" id="6_axis"]
+[ext_resource type="PackedScene" uid="uid://bgld8x6dlgami" path="res://Scenes/pistol.tscn" id="7_pistol"]
+[ext_resource type="PackedScene" uid="uid://bgvgdktxhxjjc" path="res://Scenes/pompgun.tscn" id="8_pump"]
+[ext_resource type="Script" uid="uid://dkffma8252nv3" path="res://Scripts/camera_2d.gd" id="9_camera"]
+[ext_resource type="Texture2D" uid="uid://5bo3psmyfyqo" path="res://Assets/cross.png" id="10_cross"]
+[ext_resource type="Script" uid="uid://bnnbr4wc7j360" path="res://Scripts/crosshair.gd" id="11_cross_script"]
+[ext_resource type="PackedScene" uid="uid://by1hleb47pfig" path="res://lifezone.tscn" id="12_zone"]
 
 [node name="el kanyon" type="Node2D" unique_id=1424349686]
+script = ExtResource("4_game")
+background_path = NodePath("Sprite2D")
 
 [node name="Sprite2D" type="Sprite2D" parent="." unique_id=908981650]
 texture = ExtResource("1_sas8h")
@@ -88,3 +99,41 @@ scale = Vector2(20.471775, 3.5863938)
 [node name="StaticBody2D5" parent="." unique_id=404175093 instance=ExtResource("3_x0k57")]
 position = Vector2(1568.9998, 469.99997)
 scale = Vector2(35.452644, 3.541441)
+
+[node name="SpawnPoints" type="Node2D" parent="." unique_id=1915079816]
+
+[node name="Host" type="Marker2D" parent="SpawnPoints" unique_id=1659778847]
+position = Vector2(-500, -420)
+
+[node name="Guest" type="Marker2D" parent="SpawnPoints" unique_id=1711900316]
+position = Vector2(500, -420)
+
+[node name="player" parent="." unique_id=44292137 instance=ExtResource("5_player")]
+position = Vector2(-500, -420)
+
+[node name="silaheksen" type="Node2D" parent="player" unique_id=1887597429]
+script = ExtResource("6_axis")
+
+[node name="pistol" parent="player/silaheksen" unique_id=1897811438 instance=ExtResource("7_pistol")]
+position = Vector2(25, 0)
+
+[node name="pompgun" parent="player/silaheksen" unique_id=863074045 instance=ExtResource("8_pump")]
+visible = false
+position = Vector2(25, 0)
+
+[node name="Camera2D" type="Camera2D" parent="." unique_id=1582325314]
+position_smoothing_enabled = true
+position_smoothing_speed = 7.0
+script = ExtResource("9_camera")
+minimum_frame_size = Vector2(1100, 650)
+maximum_zoom = 1.1
+player_padding = Vector2(230, 170)
+
+[node name="crosshair" type="Sprite2D" parent="." unique_id=1971642014]
+scale = Vector2(0.255, 0.255)
+texture = ExtResource("10_cross")
+offset = Vector2(0, -10.15)
+script = ExtResource("11_cross_script")
+
+[node name="lifezone" parent="." unique_id=2054321143 instance=ExtResource("12_zone")]
+scale = Vector2(228.28, 128.48)
