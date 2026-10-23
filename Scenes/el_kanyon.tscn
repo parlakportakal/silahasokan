@@ -1,0 +1,90 @@
+[gd_scene format=3 uid="uid://jjwrj5t11gc7"]
+
+[ext_resource type="Texture2D" uid="uid://nt41onhq1vlu" path="res://Assets/civirzivir/el kanyon.png" id="1_sas8h"]
+[ext_resource type="PackedScene" uid="uid://835xbk7lq8cw" path="res://Scenes/platform.tscn" id="2_oghwx"]
+[ext_resource type="PackedScene" uid="uid://cm10pumbey81a" path="res://Scenes/duvar.tscn" id="3_x0k57"]
+
+[node name="el kanyon" type="Node2D" unique_id=1424349686]
+
+[node name="Sprite2D" type="Sprite2D" parent="." unique_id=908981650]
+texture = ExtResource("1_sas8h")
+
+[node name="PLATFORM2" parent="." unique_id=1875693618 instance=ExtResource("2_oghwx")]
+position = Vector2(-1210, -423.00003)
+scale = Vector2(0.69128263, 1.4630976)
+
+[node name="PLATFORM3" parent="." unique_id=52795377 instance=ExtResource("2_oghwx")]
+position = Vector2(-1622.0001, -610)
+scale = Vector2(0.9114603, 2.0127685)
+
+[node name="PLATFORM4" parent="." unique_id=1325416913 instance=ExtResource("2_oghwx")]
+position = Vector2(-1647, -344)
+scale = Vector2(0.5073059, 2.2350793)
+
+[node name="PLATFORM5" parent="." unique_id=1645191813 instance=ExtResource("2_oghwx")]
+position = Vector2(-1255, -136.00002)
+scale = Vector2(0.6860273, 2.6064587)
+
+[node name="PLATFORM6" parent="." unique_id=2063239768 instance=ExtResource("2_oghwx")]
+position = Vector2(-1532, 240.99998)
+scale = Vector2(0.45962617, 2.866154)
+
+[node name="PLATFORM7" parent="." unique_id=827253917 instance=ExtResource("2_oghwx")]
+position = Vector2(-456.00003, 247.99997)
+scale = Vector2(0.51718503, 3.1301715)
+
+[node name="PLATFORM10" parent="." unique_id=1255146632 instance=ExtResource("2_oghwx")]
+position = Vector2(1279.9999, -134.99998)
+scale = Vector2(0.63106763, 3.216516)
+
+[node name="PLATFORM11" parent="." unique_id=336764776 instance=ExtResource("2_oghwx")]
+position = Vector2(1652, -212)
+scale = Vector2(0.25567678, 2.8863466)
+
+[node name="PLATFORM12" parent="." unique_id=1243702276 instance=ExtResource("2_oghwx")]
+position = Vector2(1580, -23.999998)
+scale = Vector2(0.43582377, 2.7273052)
+
+[node name="PLATFORM13" parent="." unique_id=1822047801 instance=ExtResource("2_oghwx")]
+position = Vector2(1845, -118)
+scale = Vector2(0.27835763, 2.5322688)
+
+[node name="PLATFORM14" parent="." unique_id=1378518497 instance=ExtResource("2_oghwx")]
+position = Vector2(1571, -369)
+scale = Vector2(0.30551246, 2.6845157)
+
+[node name="PLATFORM15" parent="." unique_id=1809456294 instance=ExtResource("2_oghwx")]
+position = Vector2(1822, -328)
+scale = Vector2(0.34731475, 2.4213953)
+
+[node name="PLATFORM16" parent="." unique_id=1399060481 instance=ExtResource("2_oghwx")]
+position = Vector2(1184, -410)
+scale = Vector2(0.7117373, 1.5563464)
+
+[node name="PLATFORM17" parent="." unique_id=1116895386 instance=ExtResource("2_oghwx")]
+position = Vector2(1607, -602)
+scale = Vector2(0.9519475, 1.6873274)
+
+[node name="PLATFORM18" parent="." unique_id=1651551491 instance=ExtResource("2_oghwx")]
+position = Vector2(1259, -519)
+scale = Vector2(0.36137703, 1.5731218)
+
+[node name="StaticBody2D" parent="." unique_id=853807131 instance=ExtResource("3_x0k57")]
+position = Vector2(-23, -42)
+scale = Vector2(82.21048, 1.42926)
+
+[node name="StaticBody2D2" parent="." unique_id=1965125167 instance=ExtResource("3_x0k57")]
+position = Vector2(6.0000005, -343)
+scale = Vector2(107.416855, 1.8539199)
+
+[node name="StaticBody2D3" parent="." unique_id=371107092 instance=ExtResource("3_x0k57")]
+position = Vector2(-1064, 519)
+scale = Vector2(32.170338, 3.6800117)
+
+[node name="StaticBody2D4" parent="." unique_id=1944261755 instance=ExtResource("3_x0k57")]
+position = Vector2(833.99994, 464)
+scale = Vector2(20.471775, 3.5863938)
+
+[node name="StaticBody2D5" parent="." unique_id=404175093 instance=ExtResource("3_x0k57")]
+position = Vector2(1568.9998, 469.99997)
+scale = Vector2(35.452644, 3.541441)
