@@ -136,10 +136,6 @@ scale = Vector2(8.391006, 0.6646012)
 position = Vector2(539, 650.00006)
 scale = Vector2(67.29026, 4.0251107)
 
-[node name="StaticBody2D3" parent="duvarlar" unique_id=1527981183 instance=ExtResource("6_ynf5e")]
-position = Vector2(513, -91.99994)
-scale = Vector2(67.29026, 4.0251107)
-
 [node name="crosshair" type="Sprite2D" parent="." unique_id=1739077503]
 scale = Vector2(0.255, 0.255)
 texture = ExtResource("12_fdnlq")
